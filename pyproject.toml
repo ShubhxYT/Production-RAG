@@ -1,0 +1,14 @@
+[project]
+name = "fullrag"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain-docling>=2.0.0",
+    "langchain-opendataloader-pdf>=2.0.0",
+    "liteparse>=1.2.1",
+    "marker-pdf>=1.10.2",
+    "torch>=2.11.0",
+    "torchvision>=0.26.0",
+]
