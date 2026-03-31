@@ -11,6 +11,11 @@ wheels/
 .md
 rag-plan.md
 
-data
 test
+
+# Keep data/results directories in git, ignore their contents.
+data/*
+!data/.gitkeep
+
 results/*
+!results/.gitkeep

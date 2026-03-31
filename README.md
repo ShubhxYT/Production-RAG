@@ -19,3 +19,11 @@ Expected commit message format:
 Example:
 
 - `iter-1: add PDF parsing pipeline scaffold`
+
+## Iteration Log
+
+### iter-2
+
+- Updated `.gitignore` so `data/` and `results/` stay in the repository while their contents are ignored.
+- Added placeholder files: `data/.gitkeep` and `results/.gitkeep`.
+- Intended usage: keep directory structure in git without committing generated files or datasets inside these folders.
