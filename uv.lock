@@ -648,20 +648,30 @@ name = "fullrag"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "beautifulsoup4" },
     { name = "langchain-docling" },
     { name = "langchain-opendataloader-pdf" },
     { name = "liteparse" },
+    { name = "markdown-it-py" },
+    { name = "markdownify" },
     { name = "marker-pdf" },
+    { name = "pydantic" },
+    { name = "python-docx" },
     { name = "torch" },
     { name = "torchvision" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "beautifulsoup4", specifier = ">=4.12.0" },
     { name = "langchain-docling", specifier = ">=2.0.0" },
     { name = "langchain-opendataloader-pdf", specifier = ">=2.0.0" },
     { name = "liteparse", specifier = ">=1.2.1" },
+    { name = "markdown-it-py", specifier = ">=3.0.0" },
+    { name = "markdownify", specifier = ">=0.13.0" },
     { name = "marker-pdf", specifier = ">=1.10.2" },
+    { name = "pydantic", specifier = ">=2.0.0" },
+    { name = "python-docx", specifier = ">=1.0.0" },
     { name = "torch", specifier = ">=2.11.0" },
     { name = "torchvision", specifier = ">=0.26.0" },
 ]

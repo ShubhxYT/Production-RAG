@@ -93,6 +93,6 @@ def convert_single(pdf_path: str, results_dir: str) -> List[Document]:
 
 if __name__ == "__main__":
     # Example usage
-    convert_single("data/Sampoorna-Raksha-Promise-V3-Brochure-(Print).pdf", "results")
+    convert_single("Assignment 2 Computer Networks.pdf", "results")
     # convert_directory("data", "results")
     pass
