@@ -22,6 +22,15 @@ Example:
 
 ## Iteration Log
 
+### iter-9: Embedding Service Implementation
+
+- Created `embeddings/service.py` with:
+	- `EmbeddingProvider` protocol for provider abstraction
+	- `SentenceTransformerProvider` using `sentence-transformers` on local CUDA GPU (GTX 1650 SUPER; falls back to CPU)
+	- `EmbeddingService` with automatic batching (configurable batch size)
+	- Model is loaded lazily and cached in memory; CUDA device auto-detected via `torch.cuda.is_available()`
+	- No API key required
+
 ### iter-8: Embeddings Module Models
 
 - Created `embeddings/` module with `EmbeddingConfig` and `EmbeddingResult` Pydantic models
