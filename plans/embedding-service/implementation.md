@@ -984,7 +984,7 @@ pytest test/test_embeddings.py -v
 
 ### Step 7: Add `.embedding_cache/` and `.embedding_output/` to `.gitignore`
 
-- [ ] Append the following to `.gitignore`:
+- [x] Append the following to `.gitignore`:
 
 ```
 # Embedding cache and output
@@ -993,7 +993,7 @@ pytest test/test_embeddings.py -v
 ```
 
 ##### Step 7 Verification Checklist
-- [ ] `git status` does not show `.embedding_cache/` or `.embedding_output/` as untracked
+- [x] `git status` does not show `.embedding_cache/` or `.embedding_output/` as untracked
 
 #### Step 7 STOP & COMMIT
 **STOP & COMMIT:** Agent must stop here and wait for the user to test, stage, and commit the change.

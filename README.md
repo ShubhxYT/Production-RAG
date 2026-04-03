@@ -22,6 +22,10 @@ Example:
 
 ## Iteration Log
 
+### iter-13: Gitignore Updates
+
+- Added `.embedding_cache/` and `.embedding_output/` to `.gitignore`
+
 ### iter-12: Embedding Unit Tests
 
 - Created `test/test_embeddings.py` with tests for:

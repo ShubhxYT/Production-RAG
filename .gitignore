@@ -20,3 +20,7 @@ data/*
 
 results/*
 !results/.gitkeep
+
+# Embedding cache and output
+.embedding_cache/
+.embedding_output/
