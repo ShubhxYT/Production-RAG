@@ -22,6 +22,13 @@ Example:
 
 ## Iteration Log
 
+### iter-10: Embedding Cache
+
+- Created `embeddings/cache.py` with `CachedEmbeddingService`
+- File-based JSON cache keyed by SHA-256 of (model_name, text)
+- Separates cached/uncached texts; only sends uncached to provider
+- Cache stored at `.embedding_cache/cache.json` by default
+
 ### iter-9: Embedding Service Implementation
 
 - Created `embeddings/service.py` with:

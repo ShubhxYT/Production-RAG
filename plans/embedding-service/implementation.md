@@ -319,7 +319,7 @@ Update README.md iteration log:
 
 ### Step 4: Implement Local Dev Cache
 
-- [ ] Create file `embeddings/cache.py`:
+- [x] Create file `embeddings/cache.py`:
 
 ```python
 """File-based embedding cache for development use."""
@@ -457,8 +457,8 @@ class CachedEmbeddingService:
 ```
 
 ##### Step 4 Verification Checklist
-- [ ] `python -c "from embeddings.cache import CachedEmbeddingService; print('OK')"` prints `OK`
-- [ ] No lint or type errors
+- [x] `python -c "from embeddings.cache import CachedEmbeddingService; print('OK')"` prints `OK`
+- [x] No lint or type errors
 
 #### Step 4 STOP & COMMIT
 **STOP & COMMIT:** Agent must stop here and wait for the user to test, stage, and commit the change.
