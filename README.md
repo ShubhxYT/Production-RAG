@@ -22,6 +22,12 @@ Example:
 
 ## Iteration Log
 
+### Metadata Enrichment - Step 4: Enrichment Prompt
+
+- Created `generation/prompts.py` with `ENRICHMENT_SYSTEM_PROMPT`
+- Instructs LLM to generate summary (1-2 sentences), keywords (3-7), hypothetical questions (2-5)
+- Emphasizes no hallucination, specific keywords, natural user questions
+
 ### Metadata Enrichment - Step 3: Generation Module
 
 - Created `generation/` module with `LLMConfig` and `ChunkEnrichment` Pydantic models
