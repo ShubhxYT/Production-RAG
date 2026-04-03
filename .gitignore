@@ -8,6 +8,7 @@ wheels/
 .github
 # Virtual environments
 .venv
+.env
 .md
 rag-plan.md
 

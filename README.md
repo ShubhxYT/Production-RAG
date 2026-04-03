@@ -22,6 +22,18 @@ Example:
 
 ## Iteration Log
 
+### Metadata Enrichment - Step 2: Updated Chunk Model
+
+- Added `summary`, `keywords`, `hypothetical_questions` fields to `Chunk` model (default to empty)
+- Added `doc_date`, `doc_version` fields to `Document` model
+- Backward compatible: existing staged JSONs without these fields still load correctly
+
+### Metadata Enrichment - Step 1: Dependencies & Config
+
+- Added `google-genai>=1.70.0` and `python-dotenv>=1.0.0` to `pyproject.toml`
+- Created `.env.example` with `GEMINI_API_KEY` and `CEREBRAS_API_KEY` placeholders
+- Created `config/settings.py` for environment-based API key loading
+
 ### iter-13: Gitignore Updates
 
 - Added `.embedding_cache/` and `.embedding_output/` to `.gitignore`

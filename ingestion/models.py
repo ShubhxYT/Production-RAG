@@ -49,6 +49,11 @@ class Chunk(BaseModel):
     position: int = 0
     overlap_before: str = ""
 
+    # Enrichment fields (populated by LLM in Step 5)
+    summary: str = ""
+    keywords: list[str] = Field(default_factory=list)
+    hypothetical_questions: list[str] = Field(default_factory=list)
+
 
 class Document(BaseModel):
     """A parsed document with structural elements and metadata."""
@@ -64,3 +69,7 @@ class Document(BaseModel):
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
+
+    # Document-level metadata (for future filtering)
+    doc_date: str | None = None
+    doc_version: str | None = None
