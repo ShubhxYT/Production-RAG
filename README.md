@@ -22,6 +22,14 @@ Example:
 
 ## Iteration Log
 
+### Metadata Enrichment - Step 3: Generation Module
+
+- Created `generation/` module with `LLMConfig` and `ChunkEnrichment` Pydantic models
+- Created `GeminiProvider` wrapping `google.genai.Client` for structured JSON enrichment
+- Uses Gemini's native `response_json_schema` - no manual JSON parsing needed
+- 3-retry exponential backoff for transient API errors
+- Token usage logged at DEBUG level
+
 ### Metadata Enrichment - Step 2: Updated Chunk Model
 
 - Added `summary`, `keywords`, `hypothetical_questions` fields to `Chunk` model (default to empty)
