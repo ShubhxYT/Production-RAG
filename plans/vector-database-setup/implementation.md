@@ -526,7 +526,7 @@ git add -A && git commit -m "feat(database): initialize alembic and create initi
 
 #### Step 4: Implement Repository/DAO Layer
 
-- [ ] Create `database/repository.py`:
+- [x] Create `database/repository.py`:
 
 ```python
 """Data access layer for documents, chunks, and embeddings."""
@@ -788,8 +788,8 @@ class DocumentRepository:
 ```
 
 ##### Step 4 Verification Checklist
-- [ ] `python -c "from database.repository import DocumentRepository; print('Repository OK')"` prints `Repository OK`
-- [ ] No import errors
+- [x] `python -c "from database.repository import DocumentRepository; print('Repository OK')"` prints `Repository OK`
+- [x] No import errors
 
 #### Step 4 STOP & COMMIT
 **STOP & COMMIT:** Agent must stop here and wait for the user to test, stage, and commit the change.
