@@ -3,6 +3,7 @@
 import logging
 from pathlib import Path
 
+from ingestion.chunker import chunk_document
 from ingestion.loaders.docx_loader import DocxLoader
 from ingestion.loaders.html_loader import HtmlLoader
 from ingestion.loaders.markdown_loader import MarkdownLoader
@@ -22,7 +23,7 @@ LOADER_REGISTRY: dict[str, type] = {
 
 
 class IngestionPipeline:
-    """Orchestrate document ingestion: load, restructure, return Documents."""
+    """Orchestrate document ingestion: load, restructure, chunk, return Documents."""
 
     def __init__(self, output_dir: str = "results"):
         self.output_dir = Path(output_dir)
@@ -41,14 +42,14 @@ class IngestionPipeline:
     def ingest_file(
         self, file_path: Path, skip_existing: bool = False
     ) -> Document | None:
-        """Ingest a single file: load and restructure into Elements.
+        """Ingest a single file: load, restructure, and chunk.
 
         Args:
             file_path: Path to the document file.
             skip_existing: Skip if the output directory already exists.
 
         Returns:
-            Populated Document with elements, or None if skipped/failed.
+            Populated Document with elements and chunks, or None if skipped/failed.
         """
         ext = file_path.suffix.lower()
         loader = self._get_loader(ext)
@@ -66,6 +67,7 @@ class IngestionPipeline:
         try:
             doc = loader.load(file_path, self.output_dir)
             doc.elements = restructure(doc.raw_content)
+            doc.chunks = chunk_document(doc)
             return doc
         except Exception:
             logger.exception("Failed to process: %s", file_path.name)
@@ -115,11 +117,13 @@ class IngestionPipeline:
                 failed += 1
 
         total_elements = sum(len(d.elements) for d in documents)
+        total_chunks = sum(len(d.chunks) for d in documents)
         logger.info(
-            "Ingestion: %d processed, %d skipped, %d failed, %d elements",
+            "Ingestion: %d processed, %d skipped, %d failed, %d elements, %d chunks",
             len(documents),
             skipped,
             failed,
             total_elements,
+            total_chunks,
         )
         return documents
