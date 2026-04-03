@@ -22,6 +22,19 @@ Example:
 
 ## Iteration Log
 
+### Metadata Enrichment - Step 7: Unit Tests
+
+- Created `test/test_enrichment.py` with 14 tests covering:
+	- `ChunkEnrichment` model validation and roundtrip serialization
+	- `LLMConfig` default values
+	- Mock provider for testing without API calls
+	- Single/multiple chunk enrichment
+	- Skip-already-enriched logic
+	- Continue-on-failure behavior
+	- Backward compatibility (old JSONs without enrichment fields)
+	- Prompt constant validation
+- All existing tests (`test_chunker.py`, `test_embeddings.py`) remain passing
+
 ### Metadata Enrichment - Step 6: CLI Enrich Subcommand
 
 - Refactored `ingestion/cli.py` to use subcommands: `ingest` and `enrich`
