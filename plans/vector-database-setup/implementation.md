@@ -367,7 +367,7 @@ git add -A && git commit -m "feat(database): define SQLAlchemy models for docume
 
 #### Step 3: Initialize Alembic & Create Initial Migration
 
-- [ ] Initialize Alembic from the project root:
+- [x] Initialize Alembic from the project root:
 
 ```bash
 cd /home/shubhpc/FullRag
@@ -375,7 +375,7 @@ source .venv/bin/activate
 alembic init alembic
 ```
 
-- [ ] Replace the generated `alembic.ini` — update `sqlalchemy.url` line to empty (we set it programmatically):
+- [x] Replace the generated `alembic.ini` — update `sqlalchemy.url` line to empty (we set it programmatically):
 
 Find this line in `alembic.ini`:
 ```
@@ -387,7 +387,7 @@ Replace it with:
 sqlalchemy.url =
 ```
 
-- [ ] Replace the generated `alembic/env.py` with:
+- [x] Replace the generated `alembic/env.py` with:
 
 ```python
 """Alembic migration environment configuration."""
@@ -453,13 +453,13 @@ else:
     run_migrations_online()
 ```
 
-- [ ] Generate the initial migration:
+- [x] Generate the initial migration:
 
 ```bash
 alembic revision --autogenerate -m "initial schema with documents chunks and embeddings"
 ```
 
-- [ ] Open the generated migration file in `alembic/versions/` and add the pgvector extension creation at the top of the `upgrade()` function. The file will be auto-generated but needs this one manual addition.
+- [x] Open the generated migration file in `alembic/versions/` and add the pgvector extension creation at the top of the `upgrade()` function. The file will be auto-generated but needs this one manual addition.
 
 Find this line near the top of `upgrade()`:
 ```python
@@ -502,18 +502,18 @@ And add to the very end of `downgrade()`:
     op.execute("DROP EXTENSION IF EXISTS vector")
 ```
 
-- [ ] Run the migration:
+- [x] Run the migration:
 
 ```bash
 alembic upgrade head
 ```
 
 ##### Step 3 Verification Checklist
-- [ ] `alembic upgrade head` runs without errors
-- [ ] Verify tables exist: `psql -h localhost -U fullrag -d fullrag -c "\dt"` shows `documents`, `chunks`, `chunk_embeddings`
-- [ ] Verify indexes exist: `psql -h localhost -U fullrag -d fullrag -c "\di"` shows HNSW, GIN, and B-tree indexes
-- [ ] Verify pgvector extension: `psql -h localhost -U fullrag -d fullrag -c "SELECT extname FROM pg_extension WHERE extname = 'vector';"` returns `vector`
-- [ ] Verify tsvector trigger: `psql -h localhost -U fullrag -d fullrag -c "\df chunks_tsv_trigger"` shows the function
+- [x] `alembic upgrade head` runs without errors
+- [x] Verify tables exist: `psql -h localhost -U fullrag -d fullrag -c "\dt"` shows `documents`, `chunks`, `chunk_embeddings`
+- [x] Verify indexes exist: `psql -h localhost -U fullrag -d fullrag -c "\di"` shows HNSW, GIN, and B-tree indexes
+- [x] Verify pgvector extension: `psql -h localhost -U fullrag -d fullrag -c "SELECT extname FROM pg_extension WHERE extname = 'vector';"` returns `vector`
+- [x] Verify tsvector trigger: `psql -h localhost -U fullrag -d fullrag -c "\df chunks_tsv_trigger"` shows the function
 
 #### Step 3 STOP & COMMIT
 **STOP & COMMIT:** Agent must stop here and wait for the user to test, stage, and commit the change.
