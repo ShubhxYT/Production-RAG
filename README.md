@@ -22,6 +22,60 @@ Example:
 
 ## Iteration Log
 
+### Metadata Enrichment - Step 7: Unit Tests
+
+- Created `test/test_enrichment.py` with 14 tests covering:
+	- `ChunkEnrichment` model validation and roundtrip serialization
+	- `LLMConfig` default values
+	- Mock provider for testing without API calls
+	- Single/multiple chunk enrichment
+	- Skip-already-enriched logic
+	- Continue-on-failure behavior
+	- Backward compatibility (old JSONs without enrichment fields)
+	- Prompt constant validation
+- All existing tests (`test_chunker.py`, `test_embeddings.py`) remain passing
+
+### Metadata Enrichment - Step 6: CLI Enrich Subcommand
+
+- Refactored `ingestion/cli.py` to use subcommands: `ingest` and `enrich`
+- `python -m ingestion enrich --input staging/` enriches all staged document chunks
+- Supports `--model`, `--delay`, `--temperature`, `--max-tokens` flags
+- Re-saves enriched documents to staging directory (or custom output)
+- Prints summary stats: enriched, skipped, failed, elapsed time
+
+### Metadata Enrichment - Step 5: Enrichment Pipeline
+
+- Created `ingestion/enrichment.py` with `enrich_chunks()` and `enrich_document()`
+- Sequential processing with configurable rate-limit delay between API calls
+- Skips already-enriched chunks (idempotent re-runs)
+- Per-chunk failure is non-fatal: logs warning, continues batch
+
+### Metadata Enrichment - Step 4: Enrichment Prompt
+
+- Created `generation/prompts.py` with `ENRICHMENT_SYSTEM_PROMPT`
+- Instructs LLM to generate summary (1-2 sentences), keywords (3-7), hypothetical questions (2-5)
+- Emphasizes no hallucination, specific keywords, natural user questions
+
+### Metadata Enrichment - Step 3: Generation Module
+
+- Created `generation/` module with `LLMConfig` and `ChunkEnrichment` Pydantic models
+- Created `GeminiProvider` wrapping `google.genai.Client` for structured JSON enrichment
+- Uses Gemini's native `response_json_schema` - no manual JSON parsing needed
+- 3-retry exponential backoff for transient API errors
+- Token usage logged at DEBUG level
+
+### Metadata Enrichment - Step 2: Updated Chunk Model
+
+- Added `summary`, `keywords`, `hypothetical_questions` fields to `Chunk` model (default to empty)
+- Added `doc_date`, `doc_version` fields to `Document` model
+- Backward compatible: existing staged JSONs without these fields still load correctly
+
+### Metadata Enrichment - Step 1: Dependencies & Config
+
+- Added `google-genai>=1.70.0` and `python-dotenv>=1.0.0` to `pyproject.toml`
+- Created `.env.example` with `GEMINI_API_KEY` and `CEREBRAS_API_KEY` placeholders
+- Created `config/settings.py` for environment-based API key loading
+
 ### iter-13: Gitignore Updates
 
 - Added `.embedding_cache/` and `.embedding_output/` to `.gitignore`
