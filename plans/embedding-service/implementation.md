@@ -657,9 +657,9 @@ main()
 
 ##### Step 5 Verification Checklist
 - [x] `python -m embeddings --help` prints the usage message without errors
-- [ ] `python -m embeddings -i staging/ -o .embedding_output` runs end-to-end (no API key required)
-- [ ] Output file `.embedding_output/embeddings.json` is created with chunk IDs and vectors
-- [ ] Summary shows `Device: cuda` and `API cost: $0.00 (local model)`
+- [x] `python -m embeddings -i staging/ -o .embedding_output` runs end-to-end (no API key required)
+- [x] Output file `.embedding_output/embeddings.json` is created with chunk IDs and vectors
+- [x] Summary shows `Device: cuda` and `API cost: $0.00 (local model)`
 
 #### Step 5 STOP & COMMIT
 **STOP & COMMIT:** Agent must stop here and wait for the user to test, stage, and commit the change.
@@ -696,7 +696,7 @@ python -m embeddings -i staging/ -o .embedding_output --model BAAI/bge-small-en-
 
 ### Step 6: Add Unit Tests
 
-- [ ] Create file `test/test_embeddings.py`:
+- [x] Create file `test/test_embeddings.py`:
 
 ```python
 """Unit tests for the embedding service."""
@@ -953,8 +953,8 @@ def test_cached_embed_one():
 ```
 
 ##### Step 6 Verification Checklist
-- [ ] `pytest test/test_embeddings.py -v` — all tests pass
-- [ ] No tests require an API key or GPU (all use `MockProvider`)
+- [x] `pytest test/test_embeddings.py -v` — all tests pass
+- [x] No tests require an API key or GPU (all use `MockProvider`)
 
 #### Step 6 STOP & COMMIT
 **STOP & COMMIT:** Agent must stop here and wait for the user to test, stage, and commit the change.

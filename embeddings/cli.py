@@ -91,13 +91,16 @@ def main() -> None:
                 "Failed to load: %s", jf.name
             )
 
-    # Collect all chunks
+    # Collect all chunks (from document elements)
     chunk_ids: list[str] = []
     chunk_texts: list[str] = []
     for doc in documents:
-        for chunk in doc.chunks:
-            chunk_ids.append(chunk.id)
-            chunk_texts.append(chunk.text)
+        for idx, element in enumerate(doc.elements):
+            text = element.content.strip()
+            if not text:
+                continue
+            chunk_ids.append(f"{doc.id}:{idx}")
+            chunk_texts.append(text)
 
     if not chunk_texts:
         print("No chunks found in staged documents.", file=sys.stderr)

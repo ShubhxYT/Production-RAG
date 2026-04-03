@@ -22,6 +22,45 @@ Example:
 
 ## Iteration Log
 
+### iter-12: Embedding Unit Tests
+
+- Created `test/test_embeddings.py` with tests for:
+	- Model defaults (`BAAI/bge-base-en-v1.5`, 768 dims, zero token cost)
+	- Batching logic (empty, single, multiple, exact boundary, 250->3 batches)
+	- Cache key determinism and uniqueness
+	- Cache hit/miss/partial-hit behavior
+	- Cache persistence to disk across instances
+- All tests use a `MockProvider` - no GPU or model download required
+
+**How to run:**
+
+```bash
+pytest test/test_embeddings.py -v
+```
+
+### iter-11: Embedding CLI
+
+- Created `embeddings/cli.py` and `embeddings/__main__.py`
+- CLI command: `python -m embeddings -i staging/ -o .embedding_output`
+- Loads staged Document JSON files, extracts chunks, embeds via local SentenceTransformer on CUDA
+- Supports `--no-cache`, `--batch-size`, `--model` options
+- Outputs `embeddings.json` mapping chunk IDs to vectors (plus device metadata)
+- Prints summary: document count, chunk count, device, elapsed time, $0.00 API cost
+- No API key required
+
+**How to run:**
+
+```bash
+# Embed all staged chunks (uses CUDA automatically)
+python -m embeddings -i staging/ -o .embedding_output
+
+# With verbose logging and no cache
+python -m embeddings -i staging/ -o .embedding_output --no-cache -v
+
+# Use a smaller/faster model
+python -m embeddings -i staging/ -o .embedding_output --model BAAI/bge-small-en-v1.5
+```
+
 ### iter-10: Embedding Cache
 
 - Created `embeddings/cache.py` with `CachedEmbeddingService`
