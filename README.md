@@ -22,6 +22,21 @@ Example:
 
 ## Iteration Log
 
+### Metadata Enrichment - Step 6: CLI Enrich Subcommand
+
+- Refactored `ingestion/cli.py` to use subcommands: `ingest` and `enrich`
+- `python -m ingestion enrich --input staging/` enriches all staged document chunks
+- Supports `--model`, `--delay`, `--temperature`, `--max-tokens` flags
+- Re-saves enriched documents to staging directory (or custom output)
+- Prints summary stats: enriched, skipped, failed, elapsed time
+
+### Metadata Enrichment - Step 5: Enrichment Pipeline
+
+- Created `ingestion/enrichment.py` with `enrich_chunks()` and `enrich_document()`
+- Sequential processing with configurable rate-limit delay between API calls
+- Skips already-enriched chunks (idempotent re-runs)
+- Per-chunk failure is non-fatal: logs warning, continues batch
+
 ### Metadata Enrichment - Step 4: Enrichment Prompt
 
 - Created `generation/prompts.py` with `ENRICHMENT_SYSTEM_PROMPT`
