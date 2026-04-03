@@ -802,7 +802,7 @@ git add -A && git commit -m "feat(database): implement repository/DAO layer with
 
 #### Step 5: Seed Script & CLI
 
-- [ ] Create `database/seed.py`:
+- [x] Create `database/seed.py`:
 
 ```python
 """Seed the database with staged documents and their embeddings."""
@@ -914,7 +914,7 @@ def seed_from_staging(
     return stats
 ```
 
-- [ ] Create `database/__main__.py`:
+- [x] Create `database/__main__.py`:
 
 ```python
 """Allow running the database module with python -m database."""
@@ -980,17 +980,17 @@ if __name__ == "__main__":
 ```
 
 ##### Step 5 Verification Checklist
-- [ ] Ensure PostgreSQL is running: `docker compose -f pgvector.yaml up -d`
-- [ ] Ensure migration is applied: `alembic upgrade head`
-- [ ] Run the seed: `python -m database seed --staging-dir staging`
-- [ ] Summary prints document, chunk, and embedding counts
-- [ ] Verify row counts in database:
+- [x] Ensure PostgreSQL is running: `docker compose -f pgvector.yaml up -d`
+- [x] Ensure migration is applied: `alembic upgrade head`
+- [x] Run the seed: `python -m database seed --staging-dir staging`
+- [x] Summary prints document, chunk, and embedding counts
+- [x] Verify row counts in database:
   ```bash
   psql -h localhost -U fullrag -d fullrag -c "SELECT count(*) FROM documents;"
   psql -h localhost -U fullrag -d fullrag -c "SELECT count(*) FROM chunks;"
   psql -h localhost -U fullrag -d fullrag -c "SELECT count(*) FROM chunk_embeddings;"
   ```
-- [ ] Running seed again skips already-inserted documents (idempotent)
+- [x] Running seed again skips already-inserted documents (idempotent)
 
 #### Step 5 STOP & COMMIT
 **STOP & COMMIT:** Agent must stop here and wait for the user to test, stage, and commit the change.
