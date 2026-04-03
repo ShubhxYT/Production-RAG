@@ -12,7 +12,6 @@ wheels/
 .md
 rag-plan.md
 
-test
 plans
 
 # Keep data/results directories in git, ignore their contents.
