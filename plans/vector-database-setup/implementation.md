@@ -1003,7 +1003,7 @@ git add -A && git commit -m "feat(database): add seed script to load staged docu
 
 #### Step 6: Integration Tests
 
-- [ ] Create `test/test_database.py`:
+- [x] Create `test/test_database.py`:
 
 ```python
 """Integration tests for the database layer.
@@ -1257,10 +1257,10 @@ class TestDocumentRepository:
 ```
 
 ##### Step 6 Verification Checklist
-- [ ] Ensure PostgreSQL is running: `docker compose -f pgvector.yaml up -d`
-- [ ] Ensure migration is applied: `alembic upgrade head`
-- [ ] Run tests: `python -m pytest test/test_database.py -v`
-- [ ] All tests pass
+- [x] Ensure PostgreSQL is running: `docker compose -f pgvector.yaml up -d`
+- [x] Ensure migration is applied: `alembic upgrade head`
+- [x] Run tests: `python -m pytest test/test_database.py -v`
+- [x] All tests pass
 
 #### Step 6 STOP & COMMIT
 **STOP & COMMIT:** Agent must stop here and wait for the user to test, stage, and commit the change.

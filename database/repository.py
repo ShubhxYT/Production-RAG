@@ -225,7 +225,7 @@ class DocumentRepository:
         )
 
         if keywords:
-            stmt = stmt.where(ChunkModel.keywords.overlap(keywords))
+            stmt = stmt.where(ChunkModel.keywords.op("&&")(keywords))
 
         if doc_date_after:
             stmt = stmt.where(DocumentModel.doc_date > doc_date_after)
