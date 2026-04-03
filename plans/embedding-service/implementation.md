@@ -479,7 +479,7 @@ Update README.md iteration log:
 
 ### Step 5: Add CLI for Batch Embedding
 
-- [ ] Create file `embeddings/cli.py`:
+- [x] Create file `embeddings/cli.py`:
 
 ```python
 """CLI for batch embedding of staged document chunks."""
@@ -645,7 +645,7 @@ if __name__ == "__main__":
     main()
 ```
 
-- [ ] Create file `embeddings/__main__.py`:
+- [x] Create file `embeddings/__main__.py`:
 
 ```python
 """Allow running the embeddings module with python -m embeddings."""
@@ -656,7 +656,7 @@ main()
 ```
 
 ##### Step 5 Verification Checklist
-- [ ] `python -m embeddings --help` prints the usage message without errors
+- [x] `python -m embeddings --help` prints the usage message without errors
 - [ ] `python -m embeddings -i staging/ -o .embedding_output` runs end-to-end (no API key required)
 - [ ] Output file `.embedding_output/embeddings.json` is created with chunk IDs and vectors
 - [ ] Summary shows `Device: cuda` and `API cost: $0.00 (local model)`
