@@ -36,3 +36,18 @@ def get_cerebras_api_key() -> str:
             "CEREBRAS_API_KEY not set. Copy .env.example to .env and add your key."
         )
     return key
+
+
+def get_database_url() -> str:
+    """Return the database URL from environment.
+
+    Defaults to the local Docker PostgreSQL from pgvector.yaml
+    if DATABASE_URL is not set.
+
+    Returns:
+        SQLAlchemy-compatible database URL.
+    """
+    return os.environ.get(
+        "DATABASE_URL",
+        "postgresql+psycopg://fullrag:fullrag@localhost:5432/fullrag",
+    )
