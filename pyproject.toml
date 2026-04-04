@@ -24,6 +24,9 @@ dependencies = [
     "psycopg[binary]>=3.2.0",
     "sqlalchemy>=2.0.0",
     "alembic>=1.15.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "openai>=1.50.0",
 ]
 
 [dependency-groups]

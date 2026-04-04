@@ -51,3 +51,43 @@ def get_database_url() -> str:
         "DATABASE_URL",
         "postgresql+psycopg://fullrag:fullrag@localhost:5432/fullrag",
     )
+
+
+def get_generation_model() -> str:
+    """Return the generation model name from environment.
+
+    Defaults to gemini-2.5-flash.
+    """
+    return os.environ.get("GENERATION_MODEL", "gemini-2.5-flash")
+
+
+def get_generation_temperature() -> float:
+    """Return the generation temperature from environment.
+
+    Defaults to 0.3.
+    """
+    return float(os.environ.get("GENERATION_TEMPERATURE", "0.3"))
+
+
+def get_generation_max_tokens() -> int:
+    """Return the max output tokens for generation from environment.
+
+    Defaults to 2048.
+    """
+    return int(os.environ.get("GENERATION_MAX_TOKENS", "2048"))
+
+
+def get_generation_provider() -> str:
+    """Return the generation provider name from environment.
+
+    Supported: 'gemini', 'cerebras'. Defaults to 'gemini'.
+    """
+    return os.environ.get("GENERATION_PROVIDER", "gemini")
+
+
+def get_cerebras_base_url() -> str:
+    """Return the Cerebras API base URL.
+
+    Defaults to the official Cerebras OpenAI-compatible endpoint.
+    """
+    return os.environ.get("CEREBRAS_BASE_URL", "https://api.cerebras.ai/v1")
