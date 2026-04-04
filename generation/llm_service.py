@@ -1,12 +1,12 @@
 """LLM service with multi-provider support for enrichment and generation."""
 
 import json
-import logging
 import time
 from typing import Protocol, runtime_checkable
 
 from google import genai
 from google.genai import types
+from observability.logging import get_logger
 
 from config.settings import (
     get_cerebras_api_key,
@@ -21,7 +21,7 @@ from generation.models import (
     TokenUsage,
 )
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 @runtime_checkable

@@ -1,13 +1,12 @@
 """Query endpoint - main RAG pipeline entry point."""
 
-import logging
-
 from fastapi import APIRouter, HTTPException
+from observability.logging import get_logger
 
 from api.models import ErrorResponse, QueryRequest, QueryResponse
 from pipeline.rag import RAGPipeline
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 router = APIRouter()
 
 # Lazy-initialized pipeline singleton

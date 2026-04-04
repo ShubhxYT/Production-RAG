@@ -1,17 +1,18 @@
 """Retrieval service orchestrating query embedding and vector search."""
 
-import logging
 import time
+
+from observability.logging import get_logger
 
 from database.connection import get_session
 from database.models import ChunkModel
 from database.repository import DocumentRepository
 from embeddings.cache import CachedEmbeddingService
 from embeddings.models import EmbeddingConfig
-from embeddings.service import EmbeddingProvider, EmbeddingService
+from embeddings.service import EmbeddingService
 from retrieval.models import RetrievalResponse, RetrievalResult
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class RetrievalService:
@@ -62,7 +63,10 @@ class RetrievalService:
         start = time.perf_counter()
 
         # 1. Embed the query
-        logger.debug("Embedding query: %s", query[:80])
+        logger.debug(
+            "Embedding query",
+            extra={"component": "retrieval", "query": query[:80]},
+        )
         query_vector = self._embedding_service.embed_one(query)
 
         # 2. Search the vector database
@@ -81,12 +85,17 @@ class RetrievalService:
 
         elapsed_ms = (time.perf_counter() - start) * 1000
 
+        top_score = results[0].similarity_score if results else 0.0
         logger.info(
-            "Retrieved %d results for query in %.1fms (top_k=%d, threshold=%s)",
-            len(results),
-            elapsed_ms,
-            top_k,
-            threshold,
+            "Retrieval complete",
+            extra={
+                "component": "retrieval",
+                "result_count": len(results),
+                "duration_ms": round(elapsed_ms, 2),
+                "top_k": top_k,
+                "threshold": threshold,
+                "top_score": top_score,
+            },
         )
 
         return RetrievalResponse(

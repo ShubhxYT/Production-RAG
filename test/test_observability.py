@@ -105,3 +105,101 @@ class TestConfigureLogging:
         log = get_logger("my.module")
         assert log.name == "my.module"
         assert isinstance(log, logging.Logger)
+
+
+from observability.tracing import (
+    clear_trace_context,
+    get_trace_id,
+    get_trace_spans,
+    get_trace_summary,
+    set_trace_context,
+    traced,
+)
+
+
+class TestTraceContext:
+    """Tests for trace context management."""
+
+    def test_set_and_get_trace_id(self):
+        set_trace_context("trace-123")
+        assert get_trace_id() == "trace-123"
+        clear_trace_context()
+
+    def test_clear_trace_context(self):
+        set_trace_context("trace-abc")
+        clear_trace_context()
+        assert get_trace_id() is None
+        assert get_trace_spans() == []
+
+
+class TestTracedDecorator:
+    """Tests for the @traced decorator."""
+
+    def test_traced_records_span(self):
+        set_trace_context("trace-span-test")
+
+        @traced("test_component")
+        def sample_function():
+            return 42
+
+        result = sample_function()
+
+        assert result == 42
+        spans = get_trace_spans()
+        assert len(spans) == 1
+        assert spans[0]["component"] == "test_component"
+        assert spans[0]["function"] == "sample_function"
+        assert spans[0]["duration_ms"] >= 0
+        assert spans[0]["trace_id"] == "trace-span-test"
+        clear_trace_context()
+
+    def test_traced_accumulates_spans(self):
+        set_trace_context("trace-multi")
+
+        @traced("comp_a")
+        def func_a():
+            pass
+
+        @traced("comp_b")
+        def func_b():
+            pass
+
+        func_a()
+        func_b()
+
+        spans = get_trace_spans()
+        assert len(spans) == 2
+        assert spans[0]["component"] == "comp_a"
+        assert spans[1]["component"] == "comp_b"
+        clear_trace_context()
+
+    def test_get_trace_summary(self):
+        set_trace_context("trace-summary")
+
+        @traced("summarized")
+        def work():
+            pass
+
+        work()
+
+        summary = get_trace_summary()
+        assert summary["trace_id"] == "trace-summary"
+        assert len(summary["spans"]) == 1
+        assert summary["total_ms"] >= 0
+        clear_trace_context()
+
+
+class TestMiddleware:
+    """Tests for the request context middleware."""
+
+    def test_request_id_header_returned(self):
+        from fastapi.testclient import TestClient
+
+        from api.main import app
+
+        client = TestClient(app)
+        response = client.get("/health")
+        assert "X-Request-ID" in response.headers
+        # Verify it's a UUID-like string
+        request_id = response.headers["X-Request-ID"]
+        assert len(request_id) == 36  # UUID format: 8-4-4-4-12

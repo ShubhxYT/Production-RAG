@@ -1,15 +1,14 @@
 """Documents listing endpoint."""
 
-import logging
-
 from fastapi import APIRouter
+from observability.logging import get_logger
 from sqlalchemy import func, select
 
 from api.models import DocumentInfo, DocumentsResponse, ErrorResponse
 from database.connection import get_session
 from database.models import ChunkModel, DocumentModel
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 router = APIRouter()
 
 

@@ -1,14 +1,13 @@
 """Health check endpoint."""
 
-import logging
-
 from fastapi import APIRouter
+from observability.logging import get_logger
 from sqlalchemy import text
 
 from api.models import ErrorResponse, HealthResponse
 from database.connection import get_session
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 router = APIRouter()
 
 

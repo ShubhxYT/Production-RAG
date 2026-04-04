@@ -1,12 +1,21 @@
 """FastAPI application for the FullRag RAG system."""
 
+import time
+import uuid
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from api.routes import documents, health, query
 from config.settings import get_log_file, get_log_format, get_log_level
-from observability.logging import configure_logging, get_logger
+from observability.logging import (
+    clear_request_context,
+    configure_logging,
+    get_logger,
+    set_request_context,
+)
+from observability.tracing import clear_trace_context, set_trace_context
 
 configure_logging(
     level=get_log_level(),
@@ -29,6 +38,44 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def request_context_middleware(request: Request, call_next):
+    """Assign a request ID and set up tracing context for each request."""
+    request_id = str(uuid.uuid4())
+    set_request_context(request_id)
+    set_trace_context(request_id)
+
+    logger.info(
+        "Request started: %s %s",
+        request.method,
+        request.url.path,
+        extra={"method": request.method, "path": request.url.path},
+    )
+
+    start = time.perf_counter()
+    response = await call_next(request)
+    duration_ms = round((time.perf_counter() - start) * 1000, 2)
+
+    response.headers["X-Request-ID"] = request_id
+    logger.info(
+        "Request completed: %s %s %d (%.1fms)",
+        request.method,
+        request.url.path,
+        response.status_code,
+        duration_ms,
+        extra={
+            "method": request.method,
+            "path": request.url.path,
+            "status_code": response.status_code,
+            "duration_ms": duration_ms,
+        },
+    )
+
+    clear_request_context()
+    clear_trace_context()
+    return response
 
 # Register routers
 app.include_router(health.router, tags=["health"])

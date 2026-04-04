@@ -1,7 +1,8 @@
 """RAG pipeline orchestrator — wires retrieval, context, prompts, and generation."""
 
-import logging
 import time
+
+from observability.logging import get_logger
 
 from generation.context_manager import ContextManager
 from generation.llm_service import GenerationProvider, get_generation_provider
@@ -15,7 +16,7 @@ from pipeline.models import (
 from retrieval.models import RetrievalResult
 from retrieval.service import RetrievalService
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class RAGPipeline:
@@ -59,7 +60,10 @@ class RAGPipeline:
         latency = LatencyBreakdown()
 
         # Step 1: Retrieve relevant chunks
-        logger.info("RAG pipeline: retrieving for '%s' (top_k=%d)", question[:80], top_k)
+        logger.info(
+            "RAG pipeline: retrieving",
+            extra={"component": "pipeline", "query": question[:80], "top_k": top_k},
+        )
         retrieval_start = time.perf_counter()
         retrieval_response = self._retrieval.retrieve(question, top_k=top_k)
         latency.retrieval_ms = round((time.perf_counter() - retrieval_start) * 1000, 2)
@@ -80,9 +84,13 @@ class RAGPipeline:
 
         # Step 5: Generate answer
         logger.info(
-            "RAG pipeline: generating with variant=%s, version=%s",
-            rendered.variant.value,
-            rendered.version,
+            "RAG pipeline: generating",
+            extra={
+                "component": "pipeline",
+                "variant": rendered.variant.value,
+                "version": rendered.version,
+                "chunk_count": len(fitted_chunks),
+            },
         )
         generation_start = time.perf_counter()
         gen_response = self._provider.generate(
@@ -98,10 +106,15 @@ class RAGPipeline:
         sources = self._build_citations(fitted_chunks)
 
         logger.info(
-            "RAG pipeline complete: answer_len=%d, sources=%d, total_ms=%.1f",
-            len(gen_response.text),
-            len(sources),
-            latency.total_ms,
+            "RAG pipeline complete",
+            extra={
+                "component": "pipeline",
+                "answer_len": len(gen_response.text),
+                "sources": len(sources),
+                "total_ms": latency.total_ms,
+                "retrieval_ms": latency.retrieval_ms,
+                "generation_ms": latency.generation_ms,
+            },
         )
 
         return RAGResponse(

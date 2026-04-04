@@ -1,13 +1,12 @@
 """Token counting and context window management."""
 
-import logging
-
 import tiktoken
+from observability.logging import get_logger
 
 from generation.models import GenerationConfig
 from retrieval.models import RetrievalResult
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # Use cl100k_base encoding (GPT-4 / general purpose tokenizer)
 _ENCODING = tiktoken.get_encoding("cl100k_base")
@@ -76,10 +75,13 @@ class ContextManager:
             used_tokens += chunk_tokens
 
         logger.info(
-            "Context selection: %d/%d chunks selected, %d/%d tokens used",
-            len(selected),
-            len(chunks),
-            used_tokens,
-            max_tokens,
+            "Context selection complete",
+            extra={
+                "component": "context_manager",
+                "input_chunks": len(chunks),
+                "selected_chunks": len(selected),
+                "tokens_used": used_tokens,
+                "budget": max_tokens,
+            },
         )
         return selected
