@@ -218,7 +218,7 @@ git add evaluation/ && git commit -m "feat(evaluation): add evaluation models an
 
 ### Step 2: Implement retrieval metric computation functions
 
-- [ ] Create `evaluation/retrieval_metrics.py`:
+- [x] Create `evaluation/retrieval_metrics.py`:
 
 ```python
 """Information retrieval metrics: Precision@k, Recall@k, MRR, NDCG@k."""
@@ -372,7 +372,7 @@ def compute_all_metrics(
     ]
 ```
 
-- [ ] Create `test/test_retrieval_metrics.py`:
+- [x] Create `test/test_retrieval_metrics.py`:
 
 ```python
 """Tests for retrieval evaluation metrics.
@@ -653,9 +653,9 @@ class TestComputeAllMetrics:
 ```
 
 ##### Step 2 Verification Checklist
-- [ ] No import errors: `python -c "from evaluation.retrieval_metrics import precision_at_k, recall_at_k, mean_reciprocal_rank, ndcg_at_k, compute_all_metrics; print('OK')"`
-- [ ] All tests pass: `python -m pytest test/test_retrieval_metrics.py -v`
-- [ ] Spot-check a hand-computed example: `python -c "from evaluation.retrieval_metrics import precision_at_k; print(precision_at_k(['a','x','b'], {'a','b'}, k=3))"`  — should print `0.6666...`
+- [x] No import errors: `python -c "from evaluation.retrieval_metrics import precision_at_k, recall_at_k, mean_reciprocal_rank, ndcg_at_k, compute_all_metrics; print('OK')"`
+- [x] All tests pass: `python -m pytest test/test_retrieval_metrics.py -v`
+- [x] Spot-check a hand-computed example: `python -c "from evaluation.retrieval_metrics import precision_at_k; print(precision_at_k(['a','x','b'], {'a','b'}, k=3))"`  — should print `0.6666...`
 
 #### Step 2 STOP & COMMIT
 **STOP & COMMIT:** Agent must stop here and wait for the user to test, stage, and commit the change.
