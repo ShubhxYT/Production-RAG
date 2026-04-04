@@ -1,18 +1,19 @@
 """FastAPI application for the FullRag RAG system."""
 
-import logging
-
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from api.routes import documents, health, query
+from config.settings import get_log_file, get_log_format, get_log_level
+from observability.logging import configure_logging, get_logger
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+configure_logging(
+    level=get_log_level(),
+    fmt=get_log_format(),
+    log_file=get_log_file(),
 )
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 app = FastAPI(
     title="FullRag API",

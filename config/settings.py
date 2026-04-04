@@ -91,3 +91,29 @@ def get_cerebras_base_url() -> str:
     Defaults to the official Cerebras OpenAI-compatible endpoint.
     """
     return os.environ.get("CEREBRAS_BASE_URL", "https://api.cerebras.ai/v1")
+
+
+def get_log_level() -> str:
+    """Return the log level from environment.
+
+    Defaults to INFO. Supported: DEBUG, INFO, WARNING, ERROR, CRITICAL.
+    """
+    return os.environ.get("LOG_LEVEL", "INFO").upper()
+
+
+def get_log_format() -> str:
+    """Return the log format from environment.
+
+    Supported: 'json' (structured), 'text' (human-readable).
+    Defaults to 'json'.
+    """
+    return os.environ.get("LOG_FORMAT", "json").lower()
+
+
+def get_log_file() -> str | None:
+    """Return the log file path from environment.
+
+    If not set, logs go to stderr only. If set, logs are also
+    written to a rotating file.
+    """
+    return os.environ.get("LOG_FILE") or None
