@@ -1,5 +1,6 @@
 """Pydantic models for evaluation datasets, metrics, and reports."""
 
+from enum import Enum
 from datetime import datetime, timezone
 
 from pydantic import BaseModel, Field
@@ -80,3 +81,40 @@ class EvaluationReport(BaseModel):
         default_factory=list,
         description="Per-query retrieval results and metrics.",
     )
+
+
+# ---------------------------------------------------------------------------
+# Generation evaluation models
+# ---------------------------------------------------------------------------
+
+
+class JudgeDimension(str, Enum):
+    """Dimensions for LLM-based generation evaluation."""
+
+    FAITHFULNESS = "faithfulness"
+    RELEVANCE = "relevance"
+    COMPLETENESS = "completeness"
+    COHERENCE = "coherence"
+
+
+class JudgeScore(BaseModel):
+    """Score from a single judge dimension."""
+
+    dimension: JudgeDimension = Field(description="Which quality dimension was evaluated.")
+    score: int = Field(ge=1, le=5, description="Score from 1 (worst) to 5 (best).")
+    reasoning: str = Field(description="Explanation for the score.")
+    passed: bool = Field(description="Whether the score meets the passing threshold (>= 3).")
+
+
+class GenerationEvalResult(BaseModel):
+    """Result of evaluating a single generation with all judges."""
+
+    query: str = Field(description="The query that was evaluated.")
+    answer: str = Field(description="The generated answer.")
+    context_chunks: list[str] = Field(
+        default_factory=list, description="Context chunk texts used for generation."
+    )
+    scores: list[JudgeScore] = Field(
+        default_factory=list, description="Scores from each judge dimension."
+    )
+    metadata: dict = Field(default_factory=dict, description="Additional metadata.")

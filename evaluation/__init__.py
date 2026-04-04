@@ -2,14 +2,20 @@
 
 from evaluation.models import (
     EvaluationReport,
+    GenerationEvalResult,
     GroundTruthDataset,
+    JudgeDimension,
+    JudgeScore,
     MetricResult,
     RelevanceAnnotation,
 )
 
 __all__ = [
     "EvaluationReport",
+    "GenerationEvalResult",
     "GroundTruthDataset",
+    "JudgeDimension",
+    "JudgeScore",
     "MetricResult",
     "RelevanceAnnotation",
 ]
