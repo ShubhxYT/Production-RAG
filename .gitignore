@@ -22,3 +22,6 @@ results/*
 # Embedding cache and output
 .embedding_cache/
 .embedding_output/
+
+# Local planning artifacts
+plans/
