@@ -118,3 +118,77 @@ class GenerationEvalResult(BaseModel):
         default_factory=list, description="Scores from each judge dimension."
     )
     metadata: dict = Field(default_factory=dict, description="Additional metadata.")
+
+
+class GenerationAnnotation(BaseModel):
+    """A single query for generation evaluation."""
+
+    query: str = Field(description="The evaluation query.")
+    expected_answer: str = Field(
+        default="",
+        description="Optional expected/reference answer.",
+    )
+    relevant_chunk_ids: list[str] = Field(
+        default_factory=list,
+        description="UUIDs of chunks relevant to this query.",
+    )
+    tags: list[str] = Field(
+        default_factory=list,
+        description="Query category tags.",
+    )
+
+
+class GenerationGroundTruth(BaseModel):
+    """A versioned dataset of generation evaluation queries."""
+
+    version: str = Field(description="Semantic version of this dataset.")
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        description="When this dataset was created.",
+    )
+    annotations: list[GenerationAnnotation] = Field(
+        default_factory=list,
+        description="List of generation evaluation queries.",
+    )
+
+
+class GenerationQueryResult(BaseModel):
+    """Per-query generation evaluation result."""
+
+    query: str = Field(description="The query text.")
+    generated_answer: str = Field(description="The generated answer.")
+    sources: list[str] = Field(
+        default_factory=list, description="Source document paths."
+    )
+    judge_scores: list[JudgeScore] = Field(
+        default_factory=list, description="Scores from each judge."
+    )
+    latency_ms: float = Field(default=0.0, description="Total pipeline latency.")
+    token_usage: dict = Field(
+        default_factory=dict, description="Token usage from generation."
+    )
+
+
+class GenerationEvaluationReport(BaseModel):
+    """Full generation evaluation report."""
+
+    timestamp: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        description="When this evaluation was run.",
+    )
+    dataset_version: str = Field(description="Version of the dataset used.")
+    pipeline_config: dict = Field(
+        default_factory=dict, description="Pipeline configuration snapshot."
+    )
+    aggregate_scores: dict[str, float] = Field(
+        default_factory=dict,
+        description="Average score per dimension.",
+    )
+    per_query_results: list[GenerationQueryResult] = Field(
+        default_factory=list,
+        description="Per-query results with judge scores.",
+    )
+    pass_rate: dict[str, float] = Field(
+        default_factory=dict,
+        description="Percentage of queries passing per dimension.",
+    )

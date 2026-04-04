@@ -1,4 +1,4 @@
-"""CLI for running retrieval evaluation."""
+"""CLI for running retrieval and generation evaluation."""
 
 import argparse
 import logging
@@ -16,17 +16,100 @@ from evaluation.retrieval_runner import (
 from retrieval.service import RetrievalService
 
 
+def _run_retrieval(args: argparse.Namespace) -> None:
+    """Run retrieval evaluation."""
+    config = EmbeddingConfig(model_name=args.model)
+    base_service = EmbeddingService(config=config)
+
+    if args.no_cache:
+        embed_service = base_service
+    else:
+        embed_service = CachedEmbeddingService(
+            service=base_service,
+            cache_dir=Path(args.cache_dir),
+        )
+
+    retrieval_service = RetrievalService(
+        embedding_service=embed_service, config=config,
+    )
+
+    runner = EvaluationRunner(
+        retrieval_service=retrieval_service,
+        dataset_path=args.dataset,
+        top_k=args.top_k,
+        threshold=args.threshold,
+        k_values=args.k_values,
+    )
+
+    report = runner.run()
+    EvaluationRunner.print_report(report, verbose=args.verbose)
+
+    if not args.no_save:
+        filepath = EvaluationRunner.save_report(report, output_dir=args.output_dir)
+        print(f"\nReport saved to: {filepath}")
+
+
+def _run_generation(args: argparse.Namespace) -> None:
+    """Run generation evaluation."""
+    from config.settings import get_generation_provider as get_provider_name
+
+    from evaluation.generation_judges import JudgePanel
+    from evaluation.generation_runner import (
+        DEFAULT_GENERATION_DATASET_PATH,
+        GenerationEvaluationRunner,
+    )
+    from pipeline.rag import RAGPipeline
+
+    # Build RAG pipeline
+    pipeline = RAGPipeline(provider_name=get_provider_name())
+
+    # Build judge panel
+    judge_provider = args.judge_provider or get_provider_name()
+    panel = JudgePanel.default_panel(provider_name=judge_provider)
+
+    # Dataset path
+    dataset_path = args.generation_dataset or DEFAULT_GENERATION_DATASET_PATH
+
+    runner = GenerationEvaluationRunner(
+        rag_pipeline=pipeline,
+        judge_panel=panel,
+        dataset_path=dataset_path,
+        top_k=args.top_k,
+    )
+
+    report = runner.run()
+    GenerationEvaluationRunner.print_report(report, verbose=args.verbose)
+
+    if not args.no_save:
+        filepath = GenerationEvaluationRunner.save_report(
+            report, output_dir=args.output_dir,
+        )
+        print(f"\nReport saved to: {filepath}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="evaluation",
-        description="Run retrieval evaluation against a ground-truth dataset.",
+        description="Run retrieval and/or generation evaluation.",
+    )
+    parser.add_argument(
+        "--mode",
+        choices=["retrieval", "generation", "all"],
+        default="retrieval",
+        help="Evaluation mode (default: retrieval).",
     )
     parser.add_argument(
         "--dataset",
         "-d",
         type=Path,
         default=DEFAULT_DATASET_PATH,
-        help=f"Path to ground-truth JSON (default: {DEFAULT_DATASET_PATH}).",
+        help=f"Path to retrieval ground-truth JSON (default: {DEFAULT_DATASET_PATH}).",
+    )
+    parser.add_argument(
+        "--generation-dataset",
+        type=Path,
+        default=None,
+        help="Path to generation ground-truth JSON (default: built-in).",
     )
     parser.add_argument(
         "--top-k",
@@ -62,6 +145,11 @@ def main() -> None:
         help="HuggingFace embedding model (default: BAAI/bge-base-en-v1.5).",
     )
     parser.add_argument(
+        "--judge-provider",
+        default=None,
+        help="LLM provider for judges (default: same as generation provider).",
+    )
+    parser.add_argument(
         "--no-cache",
         action="store_true",
         help="Disable embedding cache.",
@@ -90,39 +178,11 @@ def main() -> None:
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     )
 
-    # Build embedding service
-    config = EmbeddingConfig(model_name=args.model)
-    base_service = EmbeddingService(config=config)
+    if args.mode in ("retrieval", "all"):
+        _run_retrieval(args)
 
-    if args.no_cache:
-        embed_service = base_service
-    else:
-        embed_service = CachedEmbeddingService(
-            service=base_service,
-            cache_dir=Path(args.cache_dir),
-        )
-
-    retrieval_service = RetrievalService(
-        embedding_service=embed_service, config=config,
-    )
-
-    # Run evaluation
-    runner = EvaluationRunner(
-        retrieval_service=retrieval_service,
-        dataset_path=args.dataset,
-        top_k=args.top_k,
-        threshold=args.threshold,
-        k_values=args.k_values,
-    )
-
-    report = runner.run()
-
-    # Output
-    EvaluationRunner.print_report(report, verbose=args.verbose)
-
-    if not args.no_save:
-        filepath = EvaluationRunner.save_report(report, output_dir=args.output_dir)
-        print(f"\nReport saved to: {filepath}")
+    if args.mode in ("generation", "all"):
+        _run_generation(args)
 
 
 if __name__ == "__main__":

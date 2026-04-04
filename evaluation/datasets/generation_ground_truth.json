@@ -1,0 +1,66 @@
+{
+  "version": "0.1.0",
+  "created_at": "2026-04-04T00:00:00Z",
+  "annotations": [
+    {
+      "query": "What is the glass transition temperature of polymers?",
+      "expected_answer": "",
+      "relevant_chunk_ids": [],
+      "tags": ["factual"]
+    },
+    {
+      "query": "Explain the difference between thermoplastics and thermosets.",
+      "expected_answer": "",
+      "relevant_chunk_ids": [],
+      "tags": ["factual"]
+    },
+    {
+      "query": "What coverage does the Sampoorna Raksha Promise plan provide?",
+      "expected_answer": "",
+      "relevant_chunk_ids": [],
+      "tags": ["factual"]
+    },
+    {
+      "query": "How do polymer chains affect material properties?",
+      "expected_answer": "",
+      "relevant_chunk_ids": [],
+      "tags": ["factual"]
+    },
+    {
+      "query": "What are the key features of the life insurance product described?",
+      "expected_answer": "",
+      "relevant_chunk_ids": [],
+      "tags": ["factual"]
+    },
+    {
+      "query": "Describe the mechanical behavior of amorphous polymers.",
+      "expected_answer": "",
+      "relevant_chunk_ids": [],
+      "tags": ["paraphrased"]
+    },
+    {
+      "query": "How do the benefits of different insurance plans compare?",
+      "expected_answer": "",
+      "relevant_chunk_ids": [],
+      "tags": ["multi-hop"]
+    },
+    {
+      "query": "What is the relationship between crystallinity and polymer strength?",
+      "expected_answer": "",
+      "relevant_chunk_ids": [],
+      "tags": ["factual"]
+    },
+    {
+      "query": "Summarize the main topics covered in the polymer lectures.",
+      "expected_answer": "",
+      "relevant_chunk_ids": [],
+      "tags": ["summarization"]
+    },
+    {
+      "query": "What is the capital of Mars?",
+      "expected_answer": "",
+      "relevant_chunk_ids": [],
+      "tags": ["unanswerable"]
+    }
+  ]
+}
