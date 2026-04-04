@@ -13,15 +13,7 @@ This README is written bottom-up: internals first, then setup, then runbook.
 
 ## System Preview Image
 
-Put your image at:
-
-- `fullrag-architecture.png`
-
-Then this preview will render automatically:
-
 ![FullRag Architecture](fullrag-architecture.png)
-
-If you want a different filename, update the image path above.
 
 ## Project Structure (Bottom Layer)
 
