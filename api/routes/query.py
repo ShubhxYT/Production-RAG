@@ -1,7 +1,10 @@
 """Query endpoint - main RAG pipeline entry point."""
 
 from fastapi import APIRouter, HTTPException
+from database.connection import get_session
+from database.repository import DocumentRepository
 from observability.logging import get_logger
+from observability.logging import get_request_id
 
 from api.models import ErrorResponse, QueryRequest, QueryResponse
 from pipeline.rag import RAGPipeline
@@ -41,10 +44,12 @@ def query_rag(request: QueryRequest) -> QueryResponse:
         QueryResponse with answer, sources, latency, and token usage.
     """
     logger.info(
-        "Query received: question='%s' top_k=%d variant=%s",
-        request.question[:80],
-        request.top_k,
-        request.prompt_variant,
+        "Query received",
+        extra={
+            "question": request.question[:80],
+            "top_k": request.top_k,
+            "variant": request.prompt_variant,
+        },
     )
 
     try:
@@ -62,11 +67,40 @@ def query_rag(request: QueryRequest) -> QueryResponse:
         )
 
     logger.info(
-        "Query complete: answer_len=%d sources=%d total_ms=%.1f",
-        len(rag_response.answer),
-        len(rag_response.sources),
-        rag_response.latency.total_ms,
+        "Query complete",
+        extra={
+            "answer_len": len(rag_response.answer),
+            "sources": len(rag_response.sources),
+            "total_ms": rag_response.latency.total_ms,
+        },
     )
+
+    # Audit log (fire-and-forget, don't block response)
+    try:
+        session = get_session()
+        try:
+            repo = DocumentRepository()
+            repo.insert_query_log(session, {
+                "request_id": get_request_id(),
+                "query": request.question,
+                "answer": rag_response.answer,
+                "sources": [s.model_dump() for s in rag_response.sources],
+                "prompt_variant": request.prompt_variant,
+                "prompt_version": rag_response.prompt_version,
+                "retrieval_top_k": request.top_k,
+                "retrieval_result_count": len(rag_response.sources),
+                "latency_ms": rag_response.latency.total_ms,
+                "retrieval_ms": rag_response.latency.retrieval_ms,
+                "generation_ms": rag_response.latency.generation_ms,
+                "prompt_tokens": rag_response.token_usage.prompt_tokens,
+                "completion_tokens": rag_response.token_usage.completion_tokens,
+                "model": rag_response.prompt_version,
+            })
+            session.commit()
+        finally:
+            session.close()
+    except Exception as e:
+        logger.warning("Failed to insert query log: %s", e)
 
     return QueryResponse(
         answer=rag_response.answer,

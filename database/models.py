@@ -8,6 +8,7 @@ from sqlalchemy import (
     ARRAY,
     Column,
     DateTime,
+    Float,
     ForeignKey,
     Index,
     Integer,
@@ -140,4 +141,31 @@ class ChunkEmbeddingModel(Base):
             postgresql_with={"m": 16, "ef_construction": 200},
             postgresql_ops={"embedding": "vector_cosine_ops"},
         ),
+    )
+
+
+class QueryLogModel(Base):
+    """Audit log for RAG pipeline queries."""
+
+    __tablename__ = "query_logs"
+
+    id = Column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
+    request_id = Column(String, nullable=True, index=True)
+    query = Column(Text, nullable=False)
+    answer = Column(Text, nullable=False)
+    sources = Column(JSONB, nullable=False, default=list)
+    prompt_variant = Column(String, nullable=True)
+    prompt_version = Column(String, nullable=True)
+    retrieval_top_k = Column(Integer, nullable=True)
+    retrieval_result_count = Column(Integer, nullable=True)
+    latency_ms = Column(Float, nullable=True)
+    retrieval_ms = Column(Float, nullable=True)
+    generation_ms = Column(Float, nullable=True)
+    prompt_tokens = Column(Integer, nullable=True)
+    completion_tokens = Column(Integer, nullable=True)
+    model = Column(String, nullable=True)
+    created_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
     )

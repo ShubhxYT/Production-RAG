@@ -246,3 +246,40 @@ class TestDocumentRepository:
             {"id": doc.chunks[0].id},
         )
         assert result.scalar() is True
+
+
+class TestQueryLog:
+    """Test query audit log operations."""
+
+    def test_insert_query_log(self, session, repo):
+        log_id = repo.insert_query_log(session, {
+            "query": "What is polymer?",
+            "answer": "A polymer is a material...",
+            "sources": [{"source_path": "test.md", "similarity_score": 0.9}],
+            "prompt_variant": "qa",
+            "prompt_version": "qa_v1",
+            "retrieval_top_k": 5,
+            "retrieval_result_count": 3,
+            "latency_ms": 150.5,
+            "retrieval_ms": 50.0,
+            "generation_ms": 100.0,
+            "prompt_tokens": 200,
+            "completion_tokens": 100,
+            "model": "gemini-2.5-flash",
+        })
+        assert log_id is not None
+
+    def test_query_log_readable(self, session, repo):
+        from database.models import QueryLogModel
+
+        repo.insert_query_log(session, {
+            "query": "Test query",
+            "answer": "Test answer",
+            "sources": [],
+        })
+
+        from sqlalchemy import select
+        stmt = select(QueryLogModel).where(QueryLogModel.query == "Test query")
+        record = session.execute(stmt).scalar_one()
+        assert record.answer == "Test answer"
+        assert record.created_at is not None

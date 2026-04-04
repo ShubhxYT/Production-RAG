@@ -6,7 +6,7 @@ import logging
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
-from database.models import ChunkEmbeddingModel, ChunkModel, DocumentModel
+from database.models import ChunkEmbeddingModel, ChunkModel, DocumentModel, QueryLogModel
 from ingestion.models import Document as IngestionDocument
 
 logger = logging.getLogger(__name__)
@@ -254,3 +254,23 @@ class DocumentRepository:
         session.flush()
         logger.info("Deleted document %s (cascade)", document_id)
         return True
+
+    def insert_query_log(
+        self,
+        session: Session,
+        log_data: dict,
+    ) -> str:
+        """Insert a query audit log record.
+
+        Args:
+            session: Active SQLAlchemy session.
+            log_data: Dictionary with query log fields.
+
+        Returns:
+            The query log record ID.
+        """
+        record = QueryLogModel(**log_data)
+        session.add(record)
+        session.flush()
+        logger.debug("Inserted query log %s", record.id)
+        return record.id
