@@ -667,7 +667,7 @@ git add evaluation/retrieval_metrics.py test/test_retrieval_metrics.py && git co
 
 ### Step 3: Implement evaluation runner and CLI
 
-- [ ] Create `evaluation/retrieval_runner.py`:
+- [x] Create `evaluation/retrieval_runner.py`:
 
 ```python
 """Evaluation runner that orchestrates retrieval evaluation against a ground-truth dataset."""
@@ -873,7 +873,7 @@ class EvaluationRunner:
         print(f"\n{'=' * 60}")
 ```
 
-- [ ] Create `evaluation/cli.py`:
+- [x] Create `evaluation/cli.py`:
 
 ```python
 """CLI for running retrieval evaluation."""
@@ -1007,7 +1007,7 @@ if __name__ == "__main__":
     main()
 ```
 
-- [ ] Create `evaluation/__main__.py`:
+- [x] Create `evaluation/__main__.py`:
 
 ```python
 """Allow running the evaluation module with python -m evaluation."""
@@ -1017,7 +1017,7 @@ from evaluation.cli import main
 main()
 ```
 
-- [ ] Create `test/test_evaluation_runner.py`:
+- [x] Create `test/test_evaluation_runner.py`:
 
 ```python
 """Tests for the evaluation runner.
@@ -1342,10 +1342,10 @@ class TestEvaluationRunner:
 ```
 
 ##### Step 3 Verification Checklist
-- [ ] No import errors: `python -c "from evaluation.retrieval_runner import EvaluationRunner; from evaluation.cli import main; print('OK')"`
-- [ ] Module entry point works: `python -m evaluation --help`
-- [ ] Runner tests pass: `python -m pytest test/test_evaluation_runner.py -v`
-- [ ] All metric tests still pass: `python -m pytest test/test_retrieval_metrics.py -v`
+- [x] No import errors: `python -c "from evaluation.retrieval_runner import EvaluationRunner; from evaluation.cli import main; print('OK')"`
+- [x] Module entry point works: `python -m evaluation --help`
+- [x] Runner tests pass: `python -m pytest test/test_evaluation_runner.py -v`
+- [x] All metric tests still pass: `python -m pytest test/test_retrieval_metrics.py -v`
 
 #### Step 3 STOP & COMMIT
 **STOP & COMMIT:** Agent must stop here and wait for the user to test, stage, and commit the change.
