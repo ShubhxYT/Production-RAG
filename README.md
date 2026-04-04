@@ -152,3 +152,57 @@ python -m embeddings -i staging/ -o .embedding_output --model BAAI/bge-small-en-
 - Updated `.gitignore` so `data/` and `results/` stay in the repository while their contents are ignored.
 - Added placeholder files: `data/.gitkeep` and `results/.gitkeep`.
 - Intended usage: keep directory structure in git without committing generated files or datasets inside these folders.
+
+## Evaluation
+
+### Retrieval Evaluation
+
+Measures retrieval quality using standard information retrieval metrics against a ground-truth dataset.
+
+**Metrics:**
+- **Precision@k** - Fraction of top-k results that are relevant
+- **Recall@k** - Fraction of all relevant documents found in top-k
+- **MRR** (Mean Reciprocal Rank) - Reciprocal of the rank of the first relevant result
+- **NDCG@k** (Normalized Discounted Cumulative Gain) - Accounts for both relevance and ranking position
+
+**Running:**
+```bash
+# Full evaluation with default settings
+python -m evaluation
+
+# With verbose per-query output
+python -m evaluation --verbose
+
+# Custom parameters
+python -m evaluation --top-k 10 --k-values 1 3 5 10 --verbose
+
+# Skip saving (dry run)
+python -m evaluation --no-save --verbose
+```
+
+**Adding queries to the ground-truth dataset:**
+
+Edit `evaluation/datasets/retrieval_ground_truth.json` and add new entries to the `annotations` array:
+```json
+{
+	"query": "Your evaluation query here",
+	"relevant_chunk_ids": ["chunk-uuid-1", "chunk-uuid-2"],
+	"tags": ["factual"],
+	"notes": "Why these chunks are relevant."
+}
+```
+
+Use the chunk inspection script to find chunk IDs:
+```bash
+python -c "
+from database.connection import get_session
+from database.models import ChunkModel
+from sqlalchemy import select
+session = get_session()
+for c in session.execute(select(ChunkModel).limit(20)).scalars():
+		print(f'{c.id}: {c.text[:80]}...')
+session.close()
+"
+```
+
+**Reports** are saved to `evaluation/results/` as timestamped JSON files.

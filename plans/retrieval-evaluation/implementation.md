@@ -1357,7 +1357,7 @@ git add evaluation/retrieval_runner.py evaluation/cli.py evaluation/__main__.py 
 
 ### Step 4: Run baseline evaluation and update documentation
 
-- [ ] Populate the ground-truth dataset with real chunk IDs.
+- [x] Populate the ground-truth dataset with real chunk IDs.
 
 Run this helper script to extract chunk IDs from the database for building ground-truth annotations:
 
@@ -1387,17 +1387,17 @@ session.close()
 "
 ```
 
-- [ ] Update `evaluation/datasets/retrieval_ground_truth.json` by replacing `REPLACE_WITH_REAL_CHUNK_ID_*` placeholders with actual chunk IDs from the output above. Use the `hypothetical_questions` as query inspiration.
+- [x] Update `evaluation/datasets/retrieval_ground_truth.json` by replacing `REPLACE_WITH_REAL_CHUNK_ID_*` placeholders with actual chunk IDs from the output above. Use the `hypothetical_questions` as query inspiration.
 
-- [ ] Run the baseline evaluation:
+- [x] Run the baseline evaluation:
 
 ```bash
 python -m evaluation --verbose
 ```
 
-- [ ] Verify the report was saved to `evaluation/results/`.
+- [x] Verify the report was saved to `evaluation/results/`.
 
-- [ ] Update `README.md` — add an Evaluation section after the existing content:
+- [x] Update `README.md` — add an Evaluation section after the existing content:
 
 Add this section to the end of `README.md`:
 
@@ -1458,11 +1458,11 @@ session.close()
 ```
 
 ##### Step 4 Verification Checklist
-- [ ] Ground-truth dataset has real chunk IDs (no `REPLACE_WITH_REAL_CHUNK_ID` placeholders remaining)
-- [ ] Baseline evaluation runs without errors: `python -m evaluation --verbose`
-- [ ] Report file exists in `evaluation/results/`
-- [ ] Report contains all four metric types at all k values
-- [ ] README instructions are accurate: `python -m evaluation --help` matches documented usage
+- [x] Ground-truth dataset has real chunk IDs (no `REPLACE_WITH_REAL_CHUNK_ID` placeholders remaining)
+- [x] Baseline evaluation runs without errors: `python -m evaluation --verbose`
+- [x] Report file exists in `evaluation/results/`
+- [x] Report contains all four metric types at all k values
+- [x] README instructions are accurate: `python -m evaluation --help` matches documented usage
 
 #### Step 4 STOP & COMMIT
 **STOP & COMMIT:** Agent must stop here and wait for the user to test, stage, and commit the change.
