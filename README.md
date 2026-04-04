@@ -15,11 +15,11 @@ This README is written bottom-up: internals first, then setup, then runbook.
 
 Put your image at:
 
-- `docs/images/fullrag-architecture.png`
+- `fullrag-architecture.png`
 
 Then this preview will render automatically:
 
-![FullRag Architecture](docs/images/fullrag-architecture.png)
+![FullRag Architecture](fullrag-architecture.png)
 
 If you want a different filename, update the image path above.
 
