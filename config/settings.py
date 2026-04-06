@@ -117,3 +117,27 @@ def get_log_file() -> str | None:
     written to a rotating file.
     """
     return os.environ.get("LOG_FILE") or None
+
+
+def get_cache_ttl_seconds() -> int:
+    """Return the response cache TTL in seconds.
+
+    Defaults to 3600 (1 hour).
+    """
+    return int(os.environ.get("CACHE_TTL_SECONDS", "3600"))
+
+
+def get_cache_max_size() -> int:
+    """Return the maximum number of entries in the response cache.
+
+    Defaults to 256.
+    """
+    return int(os.environ.get("CACHE_MAX_SIZE", "256"))
+
+
+def get_response_cache_enabled() -> bool:
+    """Return whether the response cache is enabled.
+
+    Defaults to True.
+    """
+    return os.environ.get("RESPONSE_CACHE_ENABLED", "true").lower() in ("true", "1", "yes")

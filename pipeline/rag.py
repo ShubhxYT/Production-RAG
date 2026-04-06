@@ -4,10 +4,16 @@ import time
 
 from observability.logging import get_logger
 
+from config.settings import (
+    get_cache_max_size,
+    get_cache_ttl_seconds,
+    get_response_cache_enabled,
+)
 from generation.context_manager import ContextManager
 from generation.llm_service import GenerationProvider, get_generation_provider
 from generation.models import GenerationConfig, PromptVariant
 from generation.prompts import PromptRegistry
+from pipeline.cache import ResponseCache
 from pipeline.models import (
     LatencyBreakdown,
     RAGResponse,
@@ -33,12 +39,25 @@ class RAGPipeline:
         prompt_registry: PromptRegistry | None = None,
         generation_config: GenerationConfig | None = None,
         provider_name: str = "gemini",
+        response_cache: ResponseCache | None = None,
     ) -> None:
         self._retrieval = retrieval_service or RetrievalService()
         self._generation_config = generation_config or GenerationConfig()
         self._provider = generation_provider or get_generation_provider(provider_name)
         self._context_manager = context_manager or ContextManager(self._generation_config)
         self._prompt_registry = prompt_registry or PromptRegistry()
+
+        # Response cache
+        self._cache_enabled = get_response_cache_enabled()
+        if response_cache is not None:
+            self._response_cache = response_cache
+        elif self._cache_enabled:
+            self._response_cache = ResponseCache(
+                maxsize=get_cache_max_size(),
+                ttl=get_cache_ttl_seconds(),
+            )
+        else:
+            self._response_cache = None
 
     def query(
         self,
@@ -56,6 +75,12 @@ class RAGPipeline:
         Returns:
             RAGResponse with answer, sources, latency, and token usage.
         """
+        # Check response cache
+        if self._cache_enabled and self._response_cache is not None:
+            cached = self._response_cache.get(question)
+            if cached is not None:
+                return cached
+
         total_start = time.perf_counter()
         latency = LatencyBreakdown()
 
@@ -117,13 +142,19 @@ class RAGPipeline:
             },
         )
 
-        return RAGResponse(
+        response = RAGResponse(
             answer=gen_response.text,
             sources=sources,
             latency=latency,
             token_usage=gen_response.token_usage,
             prompt_version=rendered.version,
         )
+
+        # Populate cache
+        if self._cache_enabled and self._response_cache is not None:
+            self._response_cache.set(question, response)
+
+        return response
 
     @staticmethod
     def _build_citations(chunks: list[RetrievalResult]) -> list[SourceCitation]:

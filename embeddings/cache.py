@@ -5,10 +5,36 @@ import json
 import logging
 from pathlib import Path
 
+from cachetools import LRUCache
+
 from embeddings.models import EmbeddingConfig, EmbeddingResult
 from embeddings.service import EmbeddingService
 
 logger = logging.getLogger(__name__)
+
+
+class InMemoryLRUCache:
+    """In-memory LRU embedding cache layered on top of file-based cache.
+
+    Keyed on (model_name, text) SHA-256 hash. Avoids disk I/O for
+    repeated queries within the same process.
+    """
+
+    def __init__(self, maxsize: int = 1024) -> None:
+        self._cache: LRUCache[str, list[float]] = LRUCache(maxsize=maxsize)
+
+    def get(self, key: str) -> list[float] | None:
+        """Return cached vector or None."""
+        return self._cache.get(key)
+
+    def set(self, key: str, vector: list[float]) -> None:
+        """Store a vector in the LRU cache."""
+        self._cache[key] = vector
+
+    @property
+    def hits(self) -> int:
+        """Current number of items in cache."""
+        return self._cache.currsize
 
 
 def _cache_key(model_name: str, text: str) -> str:
@@ -37,11 +63,13 @@ class CachedEmbeddingService:
         self,
         service: EmbeddingService,
         cache_dir: Path | None = None,
+        lru_maxsize: int = 1024,
     ) -> None:
         self.service = service
         self.cache_dir = cache_dir or Path(".embedding_cache")
         self._cache_file = self.cache_dir / "cache.json"
         self._cache: dict[str, list[float]] = {}
+        self._lru = InMemoryLRUCache(maxsize=lru_maxsize)
         self._load_cache()
 
     def _load_cache(self) -> None:
@@ -65,7 +93,7 @@ class CachedEmbeddingService:
         )
 
     def embed(self, texts: list[str]) -> EmbeddingResult:
-        """Embed texts, using cached results where available.
+        """Embed texts, using LRU cache -> file cache -> provider.
 
         Args:
             texts: Texts to embed.
@@ -84,18 +112,29 @@ class CachedEmbeddingService:
         model = self.service.config.model_name
         keys = [_cache_key(model, t) for t in texts]
 
-        # Separate cached from uncached
+        # Separate into: LRU-hit, file-hit, uncached
         uncached_indices: list[int] = []
         uncached_texts: list[str] = []
+        lru_hits = 0
+        file_hits = 0
+
         for i, key in enumerate(keys):
-            if key not in self._cache:
+            lru_vec = self._lru.get(key)
+            if lru_vec is not None:
+                lru_hits += 1
+            elif key in self._cache:
+                file_hits += 1
+                self._lru.set(key, self._cache[key])
+            else:
                 uncached_indices.append(i)
                 uncached_texts.append(texts[i])
 
-        cache_hits = len(texts) - len(uncached_texts)
-        if cache_hits > 0:
+        if lru_hits > 0 or file_hits > 0:
             logger.info(
-                "Cache: %d hits, %d misses", cache_hits, len(uncached_texts)
+                "Cache: %d LRU hits, %d file hits, %d misses",
+                lru_hits,
+                file_hits,
+                len(uncached_texts),
             )
 
         # Embed uncached texts
@@ -104,13 +143,20 @@ class CachedEmbeddingService:
             result = self.service.embed(uncached_texts)
             total_tokens = result.token_usage
 
-            # Store new embeddings in cache
+            # Store new embeddings in both caches
             for idx, vec in zip(uncached_indices, result.vectors):
                 self._cache[keys[idx]] = vec
+                self._lru.set(keys[idx], vec)
             self._save_cache()
 
         # Assemble final result in original order
-        vectors = [self._cache[key] for key in keys]
+        vectors: list[list[float]] = []
+        for i, key in enumerate(keys):
+            lru_vec = self._lru.get(key)
+            if lru_vec is not None:
+                vectors.append(lru_vec)
+            else:
+                vectors.append(self._cache[key])
 
         return EmbeddingResult(
             vectors=vectors,

@@ -1,6 +1,6 @@
 """Tests for the RAG pipeline orchestrator."""
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -177,3 +177,81 @@ class TestRAGPipeline:
 
         with pytest.raises(RuntimeError, match="LLM error"):
             pipeline.query("test")
+
+
+class TestResponseCache:
+    """Tests for the response cache integration in RAGPipeline."""
+
+    def test_second_call_returns_cached_response(self):
+        mock_retrieval = MagicMock()
+        mock_retrieval.retrieve.return_value = _make_retrieval_response()
+
+        mock_provider = MagicMock()
+        mock_provider.generate.return_value = _make_generation_response()
+
+        pipeline = RAGPipeline(
+            retrieval_service=mock_retrieval,
+            generation_provider=mock_provider,
+            generation_config=GenerationConfig(max_context_tokens=10000),
+        )
+
+        # First call — runs pipeline
+        response1 = pipeline.query("What are polymers?")
+        assert mock_retrieval.retrieve.call_count == 1
+        assert mock_provider.generate.call_count == 1
+
+        # Second call — served from cache
+        response2 = pipeline.query("What are polymers?")
+        assert mock_retrieval.retrieve.call_count == 1  # NOT incremented
+        assert mock_provider.generate.call_count == 1  # NOT incremented
+        assert response2.answer == response1.answer
+
+    def test_cache_ttl_expiry(self):
+        from pipeline.cache import ResponseCache
+        import time
+
+        # Create cache with 1-second TTL
+        cache = ResponseCache(maxsize=10, ttl=1)
+        mock_retrieval = MagicMock()
+        mock_retrieval.retrieve.return_value = _make_retrieval_response()
+
+        mock_provider = MagicMock()
+        mock_provider.generate.return_value = _make_generation_response()
+
+        pipeline = RAGPipeline(
+            retrieval_service=mock_retrieval,
+            generation_provider=mock_provider,
+            generation_config=GenerationConfig(max_context_tokens=10000),
+            response_cache=cache,
+        )
+
+        # First call
+        pipeline.query("What are polymers?")
+        assert mock_retrieval.retrieve.call_count == 1
+
+        # Expire the cache by advancing the timer
+        time.sleep(1.1)
+
+        # Second call after TTL — re-runs pipeline
+        pipeline.query("What are polymers?")
+        assert mock_retrieval.retrieve.call_count == 2
+
+    def test_cache_disabled_bypasses_cache(self):
+        mock_retrieval = MagicMock()
+        mock_retrieval.retrieve.return_value = _make_retrieval_response()
+
+        mock_provider = MagicMock()
+        mock_provider.generate.return_value = _make_generation_response()
+
+        with patch("pipeline.rag.get_response_cache_enabled", return_value=False):
+            pipeline = RAGPipeline(
+                retrieval_service=mock_retrieval,
+                generation_provider=mock_provider,
+                generation_config=GenerationConfig(max_context_tokens=10000),
+            )
+
+        # Two calls should both run the full pipeline
+        pipeline.query("What are polymers?")
+        pipeline.query("What are polymers?")
+        assert mock_retrieval.retrieve.call_count == 2
+        assert mock_provider.generate.call_count == 2
