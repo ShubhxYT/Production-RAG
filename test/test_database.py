@@ -247,6 +247,37 @@ class TestDocumentRepository:
         )
         assert result.scalar() is True
 
+    def test_search_by_keyword_returns_results(self, session, repo):
+        doc = _make_document(num_chunks=1)
+        # The chunk text contains "Test chunk 0 content for document ..."
+        repo.insert_document(session, doc)
+        session.flush()
+
+        results = repo.search_by_keyword(session, "test chunk content", limit=5)
+        assert len(results) > 0
+        chunk, score = results[0]
+        assert 0 <= score <= 1
+
+    def test_search_by_keyword_no_match(self, session, repo):
+        doc = _make_document(num_chunks=1)
+        repo.insert_document(session, doc)
+        session.flush()
+
+        results = repo.search_by_keyword(session, "xyznonexistent", limit=5)
+        assert len(results) == 0
+
+    def test_search_by_keyword_empty_query(self, session, repo):
+        results = repo.search_by_keyword(session, "", limit=5)
+        assert len(results) == 0
+
+    def test_search_by_keyword_stop_words_only(self, session, repo):
+        doc = _make_document(num_chunks=1)
+        repo.insert_document(session, doc)
+        session.flush()
+
+        results = repo.search_by_keyword(session, "the and or", limit=5)
+        assert len(results) == 0
+
 
 class TestQueryLog:
     """Test query audit log operations."""

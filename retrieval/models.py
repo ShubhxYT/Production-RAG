@@ -22,6 +22,10 @@ class RetrievalResult(BaseModel):
     )
     source_path: str = Field(description="File path of the source document.")
     similarity_score: float = Field(description="Cosine similarity (0-1).")
+    match_type: str = Field(
+        default="vector",
+        description="How this result was found: 'vector', 'keyword', or 'hybrid'.",
+    )
     token_count: int = Field(default=0, description="Token count of the chunk.")
 
 

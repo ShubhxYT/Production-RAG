@@ -151,14 +151,49 @@ class RetrievalService:
 
             # 3. Map to RetrievalResult objects
             results = [
-                self._map_result(chunk, score) for chunk, score in raw_results
+                self._map_result(chunk, score, "vector") for chunk, score in raw_results
+            ]
+        finally:
+            session.close()
+        return results
+
+    async def retrieve_by_keyword(
+        self,
+        query: str,
+        top_k: int = 10,
+    ) -> list[RetrievalResult]:
+        """Full-text keyword search against the tsv index.
+
+        Args:
+            query: The user's search query.
+            top_k: Maximum number of results.
+
+        Returns:
+            List of RetrievalResult tagged with match_type='keyword'.
+        """
+        results = await asyncio.to_thread(
+            self._keyword_search_sync, query, top_k
+        )
+        return results
+
+    def _keyword_search_sync(
+        self,
+        query: str,
+        top_k: int,
+    ) -> list[RetrievalResult]:
+        """Synchronous keyword search via DocumentRepository."""
+        session = get_session()
+        try:
+            raw_results = self._repo.search_by_keyword(session, query, limit=top_k)
+            results = [
+                self._map_result(chunk, score, "keyword") for chunk, score in raw_results
             ]
         finally:
             session.close()
         return results
 
     @staticmethod
-    def _map_result(chunk: ChunkModel, score: float) -> RetrievalResult:
+    def _map_result(chunk: ChunkModel, score: float, match_type: str = "vector") -> RetrievalResult:
         """Map a ChunkModel + similarity score to a RetrievalResult.
 
         Accesses the chunk's parent document via the SQLAlchemy relationship
@@ -176,5 +211,6 @@ class RetrievalService:
             document_title=doc.title if doc else None,
             source_path=doc.source_path if doc else "",
             similarity_score=round(score, 4),
+            match_type=match_type,
             token_count=chunk.token_count or 0,
         )

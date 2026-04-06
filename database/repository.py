@@ -202,6 +202,62 @@ class DocumentRepository:
         results = session.execute(stmt).all()
         return [(row[0], float(row[1])) for row in results]
 
+    def search_by_keyword(
+        self,
+        session: Session,
+        query: str,
+        limit: int = 10,
+    ) -> list[tuple[ChunkModel, float]]:
+        """Full-text search over chunk text using the tsv GIN index.
+
+        Uses plainto_tsquery to safely parse arbitrary user input.
+        Returns ts_rank scores normalized to [0, 1].
+
+        Args:
+            session: Active SQLAlchemy session.
+            query: User's search query.
+            limit: Maximum number of results to return.
+
+        Returns:
+            List of (ChunkModel, score) tuples, highest score first.
+        """
+        if not query or not query.strip():
+            return []
+
+        stmt = text("""
+            SELECT c.id AS chunk_id,
+                   ts_rank(c.tsv, plainto_tsquery('english', :q)) AS score
+            FROM chunks c
+            WHERE c.tsv @@ plainto_tsquery('english', :q)
+            ORDER BY score DESC
+            LIMIT :lim
+        """)
+
+        rows = session.execute(stmt, {"q": query, "lim": limit}).all()
+
+        if not rows:
+            return []
+
+        # Normalize scores to [0, 1] by dividing by max score
+        max_score = max(r.score for r in rows)
+        if max_score <= 0:
+            return []
+
+        chunk_ids = [str(r.chunk_id) for r in rows]
+        chunks_stmt = select(ChunkModel).where(ChunkModel.id.in_(chunk_ids))
+        chunks_by_id = {
+            str(c.id): c for c in session.execute(chunks_stmt).scalars().all()
+        }
+
+        results: list[tuple[ChunkModel, float]] = []
+        for row in rows:
+            chunk = chunks_by_id.get(str(row.chunk_id))
+            if chunk:
+                normalized_score = float(row.score) / max_score
+                results.append((chunk, normalized_score))
+
+        return results
+
     def filter_by_metadata(
         self,
         session: Session,
