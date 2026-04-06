@@ -1,6 +1,6 @@
 """Tests for the FastAPI API endpoints."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from fastapi.testclient import TestClient
 
@@ -100,7 +100,7 @@ class TestQueryEndpoint:
     @patch("api.routes.query._get_pipeline")
     def test_query_success(self, mock_get_pipeline):
         mock_pipeline = MagicMock()
-        mock_pipeline.query.return_value = _mock_rag_response()
+        mock_pipeline.query = AsyncMock(return_value=_mock_rag_response())
         mock_get_pipeline.return_value = mock_pipeline
 
         response = client.post(
@@ -117,7 +117,7 @@ class TestQueryEndpoint:
     @patch("api.routes.query._get_pipeline")
     def test_query_with_top_k(self, mock_get_pipeline):
         mock_pipeline = MagicMock()
-        mock_pipeline.query.return_value = _mock_rag_response()
+        mock_pipeline.query = AsyncMock(return_value=_mock_rag_response())
         mock_get_pipeline.return_value = mock_pipeline
 
         response = client.post(
@@ -132,7 +132,7 @@ class TestQueryEndpoint:
     @patch("api.routes.query._get_pipeline")
     def test_query_with_prompt_variant(self, mock_get_pipeline):
         mock_pipeline = MagicMock()
-        mock_pipeline.query.return_value = _mock_rag_response()
+        mock_pipeline.query = AsyncMock(return_value=_mock_rag_response())
         mock_get_pipeline.return_value = mock_pipeline
 
         response = client.post(

@@ -74,7 +74,7 @@ class EvaluationRunner:
             # Retrieve using the configured top_k (retrieve enough for max k_value)
             max_k = max(self._k_values) if self._k_values else self._top_k
             retrieve_k = max(max_k, self._top_k)
-            response = self._service.retrieve(
+            response = self._service.retrieve_sync(
                 query=annotation.query,
                 top_k=retrieve_k,
                 threshold=self._threshold,

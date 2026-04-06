@@ -52,7 +52,7 @@ def _format_results(response: RetrievalResponse) -> str:
 
 def _run_single_query(service: RetrievalService, args: argparse.Namespace) -> None:
     """Run a single query and print results."""
-    response = service.retrieve(
+    response = service.retrieve_sync(
         query=args.query,
         top_k=args.top_k,
         threshold=args.threshold,
@@ -78,7 +78,7 @@ def _run_repl(service: RetrievalService, args: argparse.Namespace) -> None:
             print("Bye.")
             break
 
-        response = service.retrieve(
+        response = service.retrieve_sync(
             query=query,
             top_k=args.top_k,
             threshold=args.threshold,

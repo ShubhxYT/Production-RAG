@@ -230,7 +230,7 @@ class TestRetrievalService:
         service, doc = self._setup_service(session, repo)
 
         with patch("retrieval.service.get_session", return_value=session):
-            response = service.retrieve("test query", top_k=5)
+            response = service.retrieve_sync("test query", top_k=5)
 
         assert response.result_count > 0
         assert response.query == "test query"
@@ -241,7 +241,7 @@ class TestRetrievalService:
         service, doc = self._setup_service(session, repo)
 
         with patch("retrieval.service.get_session", return_value=session):
-            response = service.retrieve("test query", top_k=5)
+            response = service.retrieve_sync("test query", top_k=5)
 
         result = response.results[0]
         assert result.chunk_id in [c.id for c in doc.chunks]
@@ -258,7 +258,7 @@ class TestRetrievalService:
         service, doc = self._setup_service(session, repo)
 
         with patch("retrieval.service.get_session", return_value=session):
-            response = service.retrieve("test query", top_k=2)
+            response = service.retrieve_sync("test query", top_k=2)
 
         assert response.result_count <= 2
 
@@ -267,7 +267,7 @@ class TestRetrievalService:
 
         # Very high threshold - may filter out results
         with patch("retrieval.service.get_session", return_value=session):
-            response = service.retrieve(
+            response = service.retrieve_sync(
                 "test query", top_k=5, threshold=0.9999
             )
 
@@ -287,7 +287,7 @@ class TestRetrievalService:
         )
 
         with patch("retrieval.service.get_session", return_value=session):
-            response = service.retrieve(
+            response = service.retrieve_sync(
                 "completely unrelated query", top_k=5, threshold=0.99
             )
 
@@ -299,7 +299,7 @@ class TestRetrievalService:
         service, doc = self._setup_service(session, repo)
 
         with patch("retrieval.service.get_session", return_value=session):
-            response = service.retrieve("test query", top_k=5)
+            response = service.retrieve_sync("test query", top_k=5)
 
         if len(response.results) > 1:
             scores = [r.similarity_score for r in response.results]
@@ -309,7 +309,7 @@ class TestRetrievalService:
         service, doc = self._setup_service(session, repo)
 
         with patch("retrieval.service.get_session", return_value=session):
-            response = service.retrieve("hello", top_k=3, threshold=0.5)
+            response = service.retrieve_sync("hello", top_k=3, threshold=0.5)
 
         assert response.query == "hello"
         assert response.top_k == 3

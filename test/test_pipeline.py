@@ -1,6 +1,7 @@
 """Tests for the RAG pipeline orchestrator."""
 
-from unittest.mock import MagicMock, patch
+import asyncio
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -68,7 +69,7 @@ class TestRAGPipeline:
 
     def test_query_returns_rag_response(self):
         mock_retrieval = MagicMock()
-        mock_retrieval.retrieve.return_value = _make_retrieval_response()
+        mock_retrieval.retrieve = AsyncMock(return_value=_make_retrieval_response())
 
         mock_provider = MagicMock()
         mock_provider.generate.return_value = _make_generation_response()
@@ -79,7 +80,7 @@ class TestRAGPipeline:
             generation_config=GenerationConfig(max_context_tokens=10000),
         )
 
-        response = pipeline.query("What are polymers?")
+        response = asyncio.run(pipeline.query("What are polymers?"))
 
         assert isinstance(response, RAGResponse)
         assert response.answer == "Generated answer."
@@ -90,7 +91,7 @@ class TestRAGPipeline:
 
     def test_latency_breakdown_non_zero(self):
         mock_retrieval = MagicMock()
-        mock_retrieval.retrieve.return_value = _make_retrieval_response()
+        mock_retrieval.retrieve = AsyncMock(return_value=_make_retrieval_response())
 
         mock_provider = MagicMock()
         mock_provider.generate.return_value = _make_generation_response()
@@ -101,7 +102,7 @@ class TestRAGPipeline:
             generation_config=GenerationConfig(max_context_tokens=10000),
         )
 
-        response = pipeline.query("test")
+        response = asyncio.run(pipeline.query("test"))
 
         assert response.latency.total_ms > 0
         assert response.latency.retrieval_ms >= 0
@@ -110,7 +111,7 @@ class TestRAGPipeline:
 
     def test_explicit_prompt_variant(self):
         mock_retrieval = MagicMock()
-        mock_retrieval.retrieve.return_value = _make_retrieval_response()
+        mock_retrieval.retrieve = AsyncMock(return_value=_make_retrieval_response())
 
         mock_provider = MagicMock()
         mock_provider.generate.return_value = _make_generation_response()
@@ -121,14 +122,14 @@ class TestRAGPipeline:
             generation_config=GenerationConfig(max_context_tokens=10000),
         )
 
-        response = pipeline.query("Summarize the docs", prompt_variant="summarize")
+        response = asyncio.run(pipeline.query("Summarize the docs", prompt_variant="summarize"))
         assert response.prompt_version == "summarize_v1"
 
     def test_insufficient_context_auto_selected(self):
         low_score_result = _make_retrieval_result(score=0.1)
         mock_retrieval = MagicMock()
-        mock_retrieval.retrieve.return_value = _make_retrieval_response(
-            results=[low_score_result]
+        mock_retrieval.retrieve = AsyncMock(
+            return_value=_make_retrieval_response(results=[low_score_result])
         )
 
         mock_provider = MagicMock()
@@ -142,13 +143,15 @@ class TestRAGPipeline:
             generation_config=GenerationConfig(max_context_tokens=10000),
         )
 
-        response = pipeline.query("Unknown topic?")
+        response = asyncio.run(pipeline.query("Unknown topic?"))
         assert response.prompt_version == "insufficient_v1"
 
     def test_multiple_sources_in_citations(self):
         results = [_make_retrieval_result(score=0.9 - i * 0.1) for i in range(3)]
         mock_retrieval = MagicMock()
-        mock_retrieval.retrieve.return_value = _make_retrieval_response(results=results)
+        mock_retrieval.retrieve = AsyncMock(
+            return_value=_make_retrieval_response(results=results)
+        )
 
         mock_provider = MagicMock()
         mock_provider.generate.return_value = _make_generation_response()
@@ -159,12 +162,12 @@ class TestRAGPipeline:
             generation_config=GenerationConfig(max_context_tokens=10000),
         )
 
-        response = pipeline.query("test")
+        response = asyncio.run(pipeline.query("test"))
         assert len(response.sources) == 3
 
     def test_provider_failure_raises(self):
         mock_retrieval = MagicMock()
-        mock_retrieval.retrieve.return_value = _make_retrieval_response()
+        mock_retrieval.retrieve = AsyncMock(return_value=_make_retrieval_response())
 
         mock_provider = MagicMock()
         mock_provider.generate.side_effect = RuntimeError("LLM error")
@@ -176,7 +179,7 @@ class TestRAGPipeline:
         )
 
         with pytest.raises(RuntimeError, match="LLM error"):
-            pipeline.query("test")
+            asyncio.run(pipeline.query("test"))
 
 
 class TestResponseCache:
@@ -184,7 +187,7 @@ class TestResponseCache:
 
     def test_second_call_returns_cached_response(self):
         mock_retrieval = MagicMock()
-        mock_retrieval.retrieve.return_value = _make_retrieval_response()
+        mock_retrieval.retrieve = AsyncMock(return_value=_make_retrieval_response())
 
         mock_provider = MagicMock()
         mock_provider.generate.return_value = _make_generation_response()
@@ -196,12 +199,12 @@ class TestResponseCache:
         )
 
         # First call — runs pipeline
-        response1 = pipeline.query("What are polymers?")
+        response1 = asyncio.run(pipeline.query("What are polymers?"))
         assert mock_retrieval.retrieve.call_count == 1
         assert mock_provider.generate.call_count == 1
 
         # Second call — served from cache
-        response2 = pipeline.query("What are polymers?")
+        response2 = asyncio.run(pipeline.query("What are polymers?"))
         assert mock_retrieval.retrieve.call_count == 1  # NOT incremented
         assert mock_provider.generate.call_count == 1  # NOT incremented
         assert response2.answer == response1.answer
@@ -213,7 +216,7 @@ class TestResponseCache:
         # Create cache with 1-second TTL
         cache = ResponseCache(maxsize=10, ttl=1)
         mock_retrieval = MagicMock()
-        mock_retrieval.retrieve.return_value = _make_retrieval_response()
+        mock_retrieval.retrieve = AsyncMock(return_value=_make_retrieval_response())
 
         mock_provider = MagicMock()
         mock_provider.generate.return_value = _make_generation_response()
@@ -226,19 +229,19 @@ class TestResponseCache:
         )
 
         # First call
-        pipeline.query("What are polymers?")
+        asyncio.run(pipeline.query("What are polymers?"))
         assert mock_retrieval.retrieve.call_count == 1
 
         # Expire the cache by advancing the timer
         time.sleep(1.1)
 
         # Second call after TTL — re-runs pipeline
-        pipeline.query("What are polymers?")
+        asyncio.run(pipeline.query("What are polymers?"))
         assert mock_retrieval.retrieve.call_count == 2
 
     def test_cache_disabled_bypasses_cache(self):
         mock_retrieval = MagicMock()
-        mock_retrieval.retrieve.return_value = _make_retrieval_response()
+        mock_retrieval.retrieve = AsyncMock(return_value=_make_retrieval_response())
 
         mock_provider = MagicMock()
         mock_provider.generate.return_value = _make_generation_response()
@@ -251,7 +254,7 @@ class TestResponseCache:
             )
 
         # Two calls should both run the full pipeline
-        pipeline.query("What are polymers?")
-        pipeline.query("What are polymers?")
+        asyncio.run(pipeline.query("What are polymers?"))
+        asyncio.run(pipeline.query("What are polymers?"))
         assert mock_retrieval.retrieve.call_count == 2
         assert mock_provider.generate.call_count == 2

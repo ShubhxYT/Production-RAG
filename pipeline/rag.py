@@ -1,5 +1,6 @@
 """RAG pipeline orchestrator — wires retrieval, context, prompts, and generation."""
 
+import asyncio
 import time
 
 from observability.logging import get_logger
@@ -59,7 +60,7 @@ class RAGPipeline:
         else:
             self._response_cache = None
 
-    def query(
+    async def query(
         self,
         question: str,
         top_k: int = 5,
@@ -90,7 +91,7 @@ class RAGPipeline:
             extra={"component": "pipeline", "query": question[:80], "top_k": top_k},
         )
         retrieval_start = time.perf_counter()
-        retrieval_response = self._retrieval.retrieve(question, top_k=top_k)
+        retrieval_response = await self._retrieval.retrieve(question, top_k=top_k)
         latency.retrieval_ms = round((time.perf_counter() - retrieval_start) * 1000, 2)
 
         # Step 2: Fit context to token budget
@@ -107,7 +108,7 @@ class RAGPipeline:
         # Step 4: Render prompt
         rendered = self._prompt_registry.render(variant, question, fitted_chunks)
 
-        # Step 5: Generate answer
+        # Step 5: Generate answer (blocking I/O — offload to thread)
         logger.info(
             "RAG pipeline: generating",
             extra={
@@ -118,7 +119,8 @@ class RAGPipeline:
             },
         )
         generation_start = time.perf_counter()
-        gen_response = self._provider.generate(
+        gen_response = await asyncio.to_thread(
+            self._provider.generate,
             rendered.system_prompt,
             rendered.user_prompt,
             self._generation_config,

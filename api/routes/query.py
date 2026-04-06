@@ -34,7 +34,7 @@ def _get_pipeline() -> RAGPipeline:
         503: {"model": ErrorResponse},
     },
 )
-def query_rag(request: QueryRequest) -> QueryResponse:
+async def query_rag(request: QueryRequest) -> QueryResponse:
     """Execute the RAG pipeline and return a grounded answer.
 
     Args:
@@ -54,7 +54,7 @@ def query_rag(request: QueryRequest) -> QueryResponse:
 
     try:
         pipeline = _get_pipeline()
-        rag_response = pipeline.query(
+        rag_response = await pipeline.query(
             question=request.question,
             top_k=request.top_k,
             prompt_variant=request.prompt_variant,
