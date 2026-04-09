@@ -2,6 +2,7 @@
 
 import asyncio
 import time
+from pathlib import Path
 
 from observability.logging import get_logger
 
@@ -9,6 +10,8 @@ from config.settings import (
     get_cache_max_size,
     get_cache_ttl_seconds,
     get_response_cache_enabled,
+    get_transcript_fallback_enabled,
+    get_transcript_path,
 )
 from generation.context_manager import ContextManager
 from generation.llm_service import GenerationProvider, get_generation_provider
@@ -41,12 +44,22 @@ class RAGPipeline:
         generation_config: GenerationConfig | None = None,
         provider_name: str = "gemini",
         response_cache: ResponseCache | None = None,
+        transcript_fallback_enabled: bool | None = None,
+        transcript_path: str | None = None,
     ) -> None:
         self._retrieval = retrieval_service or RetrievalService()
         self._generation_config = generation_config or GenerationConfig()
         self._provider = generation_provider or get_generation_provider(provider_name)
         self._context_manager = context_manager or ContextManager(self._generation_config)
         self._prompt_registry = prompt_registry or PromptRegistry()
+
+        # Transcript fallback
+        self._transcript_fallback_enabled = (
+            transcript_fallback_enabled
+            if transcript_fallback_enabled is not None
+            else get_transcript_fallback_enabled()
+        )
+        self._transcript_path = transcript_path or get_transcript_path()
 
         # Response cache
         self._cache_enabled = get_response_cache_enabled()
@@ -105,6 +118,15 @@ class RAGPipeline:
         else:
             variant = self._prompt_registry.select_template(question, fitted_chunks)
 
+        # Step 3b: Transcript fallback — override INSUFFICIENT when enabled
+        if variant == PromptVariant.INSUFFICIENT and self._transcript_fallback_enabled:
+            logger.info(
+                "RAG pipeline: insufficient context — activating transcript fallback",
+                extra={"component": "pipeline", "transcript_path": self._transcript_path},
+            )
+            fitted_chunks = self._load_transcript_as_chunks()
+            variant = PromptVariant.TRANSCRIPT_FALLBACK
+
         # Step 4: Render prompt
         rendered = self._prompt_registry.render(variant, question, fitted_chunks)
 
@@ -157,6 +179,50 @@ class RAGPipeline:
             self._response_cache.set(question, response)
 
         return response
+
+    def _load_transcript_as_chunks(self) -> list[RetrievalResult]:
+        """Load the transcript file and split into token-budget-aware chunks.
+
+        Reads the transcript at ``self._transcript_path``, splits on blank
+        lines (paragraph-level), wraps each paragraph in a synthetic
+        RetrievalResult, then passes the list through ``fit_context`` so
+        the standard token-budget logic applies.
+
+        Returns:
+            Subset of transcript chunks that fit within the context budget.
+            Returns an empty list when the file cannot be found.
+        """
+        path = Path(self._transcript_path)
+        if not path.exists():
+            logger.warning(
+                "Transcript file not found — fallback returns empty context",
+                extra={"component": "pipeline", "transcript_path": str(path)},
+            )
+            return []
+
+        text = path.read_text(encoding="utf-8")
+        paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+
+        chunks: list[RetrievalResult] = []
+        for i, paragraph in enumerate(paragraphs):
+            chunks.append(
+                RetrievalResult(
+                    chunk_id=f"transcript-{i}",
+                    text=paragraph,
+                    summary="Transcript content",
+                    keywords=[],
+                    section_path=[],
+                    page_numbers=[],
+                    document_id="transcript",
+                    document_title="transcript",
+                    source_path=self._transcript_path,
+                    similarity_score=0.0,
+                    match_type="transcript",
+                    token_count=0,
+                )
+            )
+
+        return self._context_manager.fit_context(chunks)
 
     @staticmethod
     def _build_citations(chunks: list[RetrievalResult]) -> list[SourceCitation]:
