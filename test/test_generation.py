@@ -6,7 +6,7 @@ import pytest
 
 from generation.context_manager import ContextManager
 from generation.llm_service import (
-    CerebrasProvider,
+    GroqProvider,
     GeminiGenerationProvider,
     get_generation_provider,
 )
@@ -118,13 +118,13 @@ class TestGetGenerationProvider:
         provider = get_generation_provider("gemini")
         assert isinstance(provider, GeminiGenerationProvider)
 
-    @patch("generation.llm_service.get_cerebras_api_key", return_value="fake-key")
+    @patch("generation.llm_service.get_groq_api_key", return_value="fake-key")
     @patch(
-        "generation.llm_service.get_cerebras_base_url", return_value="https://fake.api"
+        "generation.llm_service.get_groq_base_url", return_value="https://fake.api"
     )
-    def test_cerebras_provider_instantiation(self, mock_url, mock_key):
-        provider = get_generation_provider("cerebras")
-        assert isinstance(provider, CerebrasProvider)
+    def test_groq_provider_instantiation(self, mock_url, mock_key):
+        provider = get_generation_provider("groq")
+        assert isinstance(provider, GroqProvider)
 
 
 class TestGeminiGenerationProvider:
@@ -177,20 +177,20 @@ class TestGeminiGenerationProvider:
         assert mock_client.models.generate_content.call_count == 2
 
 
-class TestCerebrasProvider:
-    """Tests for CerebrasProvider with mocked OpenAI client."""
+class TestGroqProvider:
+    """Tests for GroqProvider with mocked OpenAI client."""
 
-    @patch("generation.llm_service.get_cerebras_api_key", return_value="fake-key")
+    @patch("generation.llm_service.get_groq_api_key", return_value="fake-key")
     @patch(
-        "generation.llm_service.get_cerebras_base_url", return_value="https://fake.api"
+        "generation.llm_service.get_groq_base_url", return_value="https://fake.api"
     )
     def test_generate_returns_response(self, mock_url, mock_key):
-        provider = CerebrasProvider()
+        provider = GroqProvider()
 
         # Mock the OpenAI client's create method
         mock_response = MagicMock()
         mock_choice = MagicMock()
-        mock_choice.message.content = "Cerebras answer."
+        mock_choice.message.content = "Groq answer."
         mock_choice.finish_reason = "stop"
         mock_response.choices = [mock_choice]
         mock_response.usage.prompt_tokens = 80
@@ -199,9 +199,9 @@ class TestCerebrasProvider:
 
         provider._client.chat.completions.create = MagicMock(return_value=mock_response)
 
-        config = GenerationConfig(model_name="llama-3.3-70b")
+        config = GenerationConfig(model_name="llama-3.3-70b-versatile")
         result = provider.generate("system", "user query", config)
 
         assert isinstance(result, GenerationResponse)
-        assert result.text == "Cerebras answer."
+        assert result.text == "Groq answer."
         assert result.token_usage.total_tokens == 120

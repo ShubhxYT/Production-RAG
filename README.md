@@ -55,7 +55,7 @@ Default local database URL:
 Create `.env` from `.env.example` and set:
 
 - `GEMINI_API_KEY` (required only for enrichment)
-- `CEREBRAS_API_KEY` (reserved for future generation flow)
+- `GROQ_API_KEY` (required for RAG answer generation — get one at console.groq.com)
 - `DATABASE_URL` (optional if you use local default)
 
 ## Setup

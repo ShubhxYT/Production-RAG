@@ -169,3 +169,26 @@ class QueryLogModel(Base):
         nullable=False,
         default=lambda: datetime.now(timezone.utc),
     )
+
+
+class FeedbackLogModel(Base):
+    """User feedback on RAG query responses."""
+
+    __tablename__ = "feedback_logs"
+
+    id = Column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
+    query_log_id = Column(String, nullable=True)
+    feedback_type = Column(String, nullable=False)
+    rating = Column(Integer, nullable=True)
+    correction = Column(Text, nullable=True)
+    query_text = Column(Text, nullable=True)
+    created_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+    __table_args__ = (
+        Index("ix_feedback_logs_query_log_id", "query_log_id"),
+        Index("ix_feedback_logs_created_at", "created_at"),
+    )

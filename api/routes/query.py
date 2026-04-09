@@ -76,11 +76,12 @@ async def query_rag(request: QueryRequest) -> QueryResponse:
     )
 
     # Audit log (fire-and-forget, don't block response)
+    query_log_id = None
     try:
         session = get_session()
         try:
             repo = DocumentRepository()
-            repo.insert_query_log(session, {
+            query_log_id = repo.insert_query_log(session, {
                 "request_id": get_request_id(),
                 "query": request.question,
                 "answer": rag_response.answer,
@@ -108,4 +109,5 @@ async def query_rag(request: QueryRequest) -> QueryResponse:
         latency=rag_response.latency,
         token_usage=rag_response.token_usage,
         prompt_version=rag_response.prompt_version,
+        query_log_id=query_log_id,
     )

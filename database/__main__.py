@@ -29,6 +29,22 @@ def main() -> None:
         help="Enable verbose (DEBUG) logging.",
     )
 
+    # clear subcommand
+    clear_parser = subparsers.add_parser(
+        "clear", help="Clear all tables from the database."
+    )
+    clear_parser.add_argument(
+        "--confirm",
+        action="store_true",
+        help="Confirm the operation without prompting.",
+    )
+    clear_parser.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Enable verbose (DEBUG) logging.",
+    )
+
     args = parser.parse_args()
 
     if args.command is None:
@@ -54,6 +70,23 @@ def main() -> None:
         print(f"Skipped (existing): {stats['skipped']}")
         print(f"Failed:             {stats.get('failed', 0)}")
         print(f"Elapsed time:       {stats.get('elapsed_seconds', 0):.2f}s")
+
+    elif args.command == "clear":
+        from database.models import Base
+        from database.connection import get_engine
+
+        if not args.confirm:
+            response = input(
+                "\nWARNING: This will delete all tables from the database!\n"
+                "Are you sure you want to proceed? (yes/no): "
+            )
+            if response.lower() != "yes":
+                print("Operation cancelled.")
+                sys.exit(0)
+
+        engine = get_engine()
+        Base.metadata.drop_all(engine)
+        print("\nDatabase cleared successfully. All tables dropped.")
 
 
 if __name__ == "__main__":

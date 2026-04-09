@@ -34,6 +34,7 @@ class QueryResponse(BaseModel):
     latency: LatencyBreakdown
     token_usage: TokenUsage
     prompt_version: str
+    query_log_id: str | None = None
 
 
 class HealthResponse(BaseModel):

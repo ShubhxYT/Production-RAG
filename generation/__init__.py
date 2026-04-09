@@ -2,10 +2,10 @@
 
 from generation.context_manager import ContextManager
 from generation.llm_service import (
-	CerebrasProvider,
 	GeminiGenerationProvider,
 	GeminiProvider,
 	GenerationProvider,
+	GroqProvider,
 	get_generation_provider,
 )
 from generation.models import (

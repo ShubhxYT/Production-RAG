@@ -2,13 +2,20 @@
 
 import time
 import uuid
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from api.routes import documents, health, query
-from config.settings import get_log_file, get_log_format, get_log_level
+from api.routes import documents, evaluation, health, query
+from config.settings import (
+    get_continuous_eval_enabled,
+    get_eval_schedule_interval_hours,
+    get_log_file,
+    get_log_format,
+    get_log_level,
+)
 from observability.logging import (
     clear_request_context,
     configure_logging,
@@ -24,10 +31,27 @@ configure_logging(
 )
 logger = get_logger(__name__)
 
+_scheduler = None
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global _scheduler
+    if get_continuous_eval_enabled():
+        from evaluation.scheduler import BackgroundEvaluationScheduler
+
+        _scheduler = BackgroundEvaluationScheduler()
+        _scheduler.start(get_eval_schedule_interval_hours())
+    yield
+    if _scheduler:
+        _scheduler.stop()
+
+
 app = FastAPI(
     title="FullRag API",
     description="RAG pipeline REST API - retrieve and generate grounded answers.",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 # CORS middleware
@@ -81,6 +105,7 @@ async def request_context_middleware(request: Request, call_next):
 app.include_router(health.router, tags=["health"])
 app.include_router(documents.router, tags=["documents"])
 app.include_router(query.router, tags=["query"])
+app.include_router(evaluation.router, tags=["evaluation"])
 
 
 @app.exception_handler(Exception)

@@ -150,7 +150,7 @@ class JudgePanel:
         """Create a panel with all four judge dimensions.
 
         Args:
-            provider_name: LLM provider to use ('gemini' or 'cerebras').
+            provider_name: LLM provider to use ('gemini' or 'groq').
 
         Returns:
             JudgePanel with faithfulness, relevance, completeness, coherence judges.

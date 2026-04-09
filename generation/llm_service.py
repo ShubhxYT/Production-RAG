@@ -9,9 +9,10 @@ from google.genai import types
 from observability.logging import get_logger
 
 from config.settings import (
-    get_cerebras_api_key,
-    get_cerebras_base_url,
     get_gemini_api_key,
+    get_groq_api_key,
+    get_groq_base_url,
+    get_groq_model,
 )
 from generation.models import (
     ChunkEnrichment,
@@ -203,15 +204,16 @@ class GeminiGenerationProvider:
         )
 
 
-class CerebrasProvider:
-    """Cerebras provider using the OpenAI-compatible API."""
+class GroqProvider:
+    """Groq provider using the OpenAI-compatible API."""
 
     def __init__(self) -> None:
         import openai
 
+        self._model_name = get_groq_model()
         self._client = openai.OpenAI(
-            api_key=get_cerebras_api_key(),
-            base_url=get_cerebras_base_url(),
+            api_key=get_groq_api_key(),
+            base_url=get_groq_base_url(),
         )
 
     def generate(
@@ -220,7 +222,7 @@ class CerebrasProvider:
         user_prompt: str,
         config: GenerationConfig,
     ) -> GenerationResponse:
-        """Generate a free-text answer using Cerebras.
+        """Generate a free-text answer using Groq.
 
         Args:
             system_prompt: System instruction for the LLM.
@@ -239,7 +241,7 @@ class CerebrasProvider:
         for attempt in range(1, max_retries + 1):
             try:
                 response = self._client.chat.completions.create(
-                    model=config.model_name,
+                    model=self._model_name,
                     messages=[
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": user_prompt},
@@ -251,7 +253,7 @@ class CerebrasProvider:
                 choice = response.choices[0]
                 raw_text = choice.message.content or ""
                 if not raw_text:
-                    raise ValueError("Empty response from Cerebras")
+                    raise ValueError("Empty response from Groq")
 
                 token_usage = TokenUsage()
                 if response.usage:
@@ -263,7 +265,7 @@ class CerebrasProvider:
 
                 return GenerationResponse(
                     text=raw_text,
-                    model=config.model_name,
+                    model=self._model_name,
                     token_usage=token_usage,
                     finish_reason=choice.finish_reason or "stop",
                 )
@@ -273,7 +275,7 @@ class CerebrasProvider:
                 if attempt < max_retries:
                     wait = 2**attempt
                     logger.warning(
-                        "Cerebras attempt %d/%d failed: %s. Retrying in %ds...",
+                        "Groq attempt %d/%d failed: %s. Retrying in %ds...",
                         attempt,
                         max_retries,
                         e,
@@ -282,7 +284,7 @@ class CerebrasProvider:
                     time.sleep(wait)
 
         raise RuntimeError(
-            f"Cerebras generation failed after {max_retries} retries: {last_error}"
+            f"Groq generation failed after {max_retries} retries: {last_error}"
         )
 
 
@@ -300,7 +302,7 @@ def get_generation_provider(provider_name: str = "gemini") -> GenerationProvider
     """
     providers = {
         "gemini": GeminiGenerationProvider,
-        "cerebras": CerebrasProvider,
+        "groq": GroqProvider,
     }
     if provider_name not in providers:
         raise ValueError(

@@ -2,11 +2,12 @@
 
 import hashlib
 import logging
+from datetime import datetime
 
-from sqlalchemy import select, text
+from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
-from database.models import ChunkEmbeddingModel, ChunkModel, DocumentModel, QueryLogModel
+from database.models import ChunkEmbeddingModel, ChunkModel, DocumentModel, FeedbackLogModel, QueryLogModel
 from ingestion.models import Document as IngestionDocument
 
 logger = logging.getLogger(__name__)
@@ -95,7 +96,7 @@ class DocumentRepository:
         )
         session.add(emb_model)
         session.flush()
-        return emb_model.id
+        return str(emb_model.id)
 
     def insert_bulk_embeddings(
         self,
@@ -329,4 +330,64 @@ class DocumentRepository:
         session.add(record)
         session.flush()
         logger.debug("Inserted query log %s", record.id)
-        return record.id
+        return str(record.id)
+
+    def insert_feedback_log(
+        self,
+        session: Session,
+        log_data: dict,
+    ) -> str:
+        """Insert a feedback log record.
+
+        Args:
+            session: Active SQLAlchemy session.
+            log_data: Dictionary with feedback log fields.
+
+        Returns:
+            The feedback log record ID.
+        """
+        record = FeedbackLogModel(**log_data)
+        session.add(record)
+        session.flush()
+        logger.debug("Inserted feedback log %s", record.id)
+        return str(record.id)
+
+    def get_feedback_stats(
+        self,
+        session: Session,
+        since: datetime | None = None,
+    ) -> dict:
+        """Get aggregated feedback statistics.
+
+        Args:
+            session: Active SQLAlchemy session.
+            since: If provided, only count feedback after this datetime.
+
+        Returns:
+            Dict with keys: total, thumbs_up, thumbs_down, correction, avg_rating.
+        """
+        base = select(
+            func.count(FeedbackLogModel.id).label("total"),
+            func.count(FeedbackLogModel.id).filter(
+                FeedbackLogModel.feedback_type == "thumbs_up"
+            ).label("thumbs_up"),
+            func.count(FeedbackLogModel.id).filter(
+                FeedbackLogModel.feedback_type == "thumbs_down"
+            ).label("thumbs_down"),
+            func.count(FeedbackLogModel.id).filter(
+                FeedbackLogModel.feedback_type == "correction"
+            ).label("correction"),
+            func.avg(FeedbackLogModel.rating).label("avg_rating"),
+        )
+
+        if since is not None:
+            base = base.where(FeedbackLogModel.created_at >= since)
+
+        row = session.execute(base).one()
+        return {
+            "total": row.total,
+            "thumbs_up": row.thumbs_up,
+            "thumbs_down": row.thumbs_down,
+            "correction": row.correction,
+            "avg_rating": float(row.avg_rating) if row.avg_rating is not None else None,
+        }

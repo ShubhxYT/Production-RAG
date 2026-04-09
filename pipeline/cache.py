@@ -60,4 +60,4 @@ class ResponseCache:
     @property
     def size(self) -> int:
         """Current number of (non-expired) entries."""
-        return self._cache.currsize
+        return int(self._cache.currsize)
