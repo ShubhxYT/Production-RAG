@@ -4,7 +4,7 @@ import logging
 from typing import Callable
 
 from generation.models import PromptVariant, RenderedPrompt
-from generation.prompt_templates import insufficient_v1, qa_v1, summarize_v1
+from generation.prompt_templates import insufficient_v1, qa_v1, summarize_v1, transcript_fallback_v1
 from retrieval.models import RetrievalResult
 
 logger = logging.getLogger(__name__)
@@ -60,6 +60,7 @@ class PromptRegistry:
 			PromptVariant.QA: qa_v1.render,
 			PromptVariant.SUMMARIZE: summarize_v1.render,
 			PromptVariant.INSUFFICIENT: insufficient_v1.render,
+			PromptVariant.TRANSCRIPT_FALLBACK: transcript_fallback_v1.render,
 		}
 
 	def select_template(
