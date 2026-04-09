@@ -64,6 +64,7 @@ class PromptVariant(str, Enum):
     QA = "qa"
     SUMMARIZE = "summarize"
     INSUFFICIENT = "insufficient"
+    TRANSCRIPT_FALLBACK = "transcript_fallback"
 
 
 class RenderedPrompt(BaseModel):

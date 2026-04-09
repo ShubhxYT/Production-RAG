@@ -24,16 +24,16 @@ def get_gemini_api_key() -> str:
     return key
 
 
-def get_cerebras_api_key() -> str:
-    """Return the Cerebras API key from environment.
+def get_groq_api_key() -> str:
+    """Return the Groq API key from environment.
 
     Raises:
-        RuntimeError: If CEREBRAS_API_KEY is not set.
+        RuntimeError: If GROQ_API_KEY is not set.
     """
-    key = os.environ.get("CEREBRAS_API_KEY", "")
+    key = os.environ.get("GROQ_API_KEY", "")
     if not key:
         raise RuntimeError(
-            "CEREBRAS_API_KEY not set. Copy .env.example to .env and add your key."
+            "GROQ_API_KEY not set. Copy .env.example to .env and add your key."
         )
     return key
 
@@ -80,17 +80,25 @@ def get_generation_max_tokens() -> int:
 def get_generation_provider() -> str:
     """Return the generation provider name from environment.
 
-    Supported: 'gemini', 'cerebras'. Defaults to 'gemini'.
+    Supported: 'gemini', 'groq'. Defaults to 'gemini'.
     """
     return os.environ.get("GENERATION_PROVIDER", "gemini")
 
 
-def get_cerebras_base_url() -> str:
-    """Return the Cerebras API base URL.
+def get_groq_base_url() -> str:
+    """Return the Groq API base URL.
 
-    Defaults to the official Cerebras OpenAI-compatible endpoint.
+    Defaults to the official Groq OpenAI-compatible endpoint.
     """
-    return os.environ.get("CEREBRAS_BASE_URL", "https://api.cerebras.ai/v1")
+    return os.environ.get("GROQ_BASE_URL", "https://api.groq.com/openai/v1")
+
+
+def get_groq_model() -> str:
+    """Return the Groq model name from environment.
+
+    Defaults to llama-3.3-70b-versatile. Override with GROQ_MODEL env var.
+    """
+    return os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
 
 
 def get_log_level() -> str:
@@ -141,3 +149,40 @@ def get_response_cache_enabled() -> bool:
     Defaults to True.
     """
     return os.environ.get("RESPONSE_CACHE_ENABLED", "true").lower() in ("true", "1", "yes")
+
+
+def get_continuous_eval_enabled() -> bool:
+    """Return whether continuous evaluation is enabled.
+
+    Defaults to True.
+    """
+    return os.environ.get("CONTINUOUS_EVAL_ENABLED", "true").lower() in ("true", "1", "yes")
+
+
+def get_eval_schedule_interval_hours() -> int:
+    """Return the evaluation schedule interval in hours.
+
+    Defaults to 24 (daily).
+    """
+    return int(os.environ.get("EVAL_SCHEDULE_INTERVAL_HOURS", "24"))
+
+
+def get_transcript_fallback_enabled() -> bool:
+    """Return whether transcript fallback is enabled.
+
+    When True, queries that return insufficient context fall back to
+    answering from the raw transcript file. Defaults to True.
+    """
+    return os.environ.get("TRANSCRIPT_FALLBACK_ENABLED", "true").lower() in (
+        "true",
+        "1",
+        "yes",
+    )
+
+
+def get_transcript_path() -> str:
+    """Return the path to the transcript file used as fallback context.
+
+    Defaults to 'data/transcript.md'. Override with TRANSCRIPT_PATH env var.
+    """
+    return os.environ.get("TRANSCRIPT_PATH", "data/transcript.md")
