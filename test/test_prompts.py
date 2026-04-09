@@ -90,6 +90,59 @@ class TestInsufficientTemplate:
         assert "No relevant documents" in result.user_prompt
 
 
+class TestTranscriptFallbackTemplate:
+    """Tests for the transcript fallback prompt template."""
+
+    def test_render_returns_transcript_fallback_variant(self):
+        from generation.prompt_templates import transcript_fallback_v1
+
+        chunks = [_make_result(text="RAG stands for Retrieval-Augmented Generation.")]
+        result = transcript_fallback_v1.render("What is RAG?", chunks)
+        assert isinstance(result, RenderedPrompt)
+        assert result.variant == PromptVariant.TRANSCRIPT_FALLBACK
+        assert result.version == "transcript_fallback_v1"
+
+    def test_user_prompt_contains_query(self):
+        from generation.prompt_templates import transcript_fallback_v1
+
+        result = transcript_fallback_v1.render(
+            "Explain the validation nodes.", [_make_result()]
+        )
+        assert "Explain the validation nodes." in result.user_prompt
+
+    def test_user_prompt_contains_transcript_source_label(self):
+        from generation.prompt_templates import transcript_fallback_v1
+
+        chunks = [_make_result(text="The gatekeeper validates queries.")]
+        result = transcript_fallback_v1.render("What does the gatekeeper do?", chunks)
+        assert "[Source 1: transcript]" in result.user_prompt
+        assert "The gatekeeper validates queries." in result.user_prompt
+
+    def test_multiple_chunks_numbered_correctly(self):
+        from generation.prompt_templates import transcript_fallback_v1
+
+        chunks = [_make_result(text=f"Paragraph {i}.") for i in range(3)]
+        result = transcript_fallback_v1.render("Q?", chunks)
+        assert "[Source 1: transcript]" in result.user_prompt
+        assert "[Source 2: transcript]" in result.user_prompt
+        assert "[Source 3: transcript]" in result.user_prompt
+
+    def test_system_prompt_instructs_transcript_citation(self):
+        from generation.prompt_templates import transcript_fallback_v1
+
+        result = transcript_fallback_v1.render("Q?", [_make_result()])
+        assert "transcript" in result.system_prompt.lower()
+        assert "[Source: transcript]" in result.system_prompt
+
+    def test_registry_renders_transcript_fallback_variant(self):
+        registry = PromptRegistry()
+        rendered = registry.render(
+            PromptVariant.TRANSCRIPT_FALLBACK, "Q?", [_make_result()]
+        )
+        assert isinstance(rendered, RenderedPrompt)
+        assert rendered.variant == PromptVariant.TRANSCRIPT_FALLBACK
+
+
 class TestPromptRegistry:
     """Tests for the PromptRegistry auto-selection logic."""
 

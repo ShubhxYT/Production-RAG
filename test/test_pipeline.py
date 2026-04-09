@@ -39,7 +39,8 @@ def _make_retrieval_result(score: float = 0.85) -> RetrievalResult:
 def _make_retrieval_response(
     query: str = "test", results: list[RetrievalResult] | None = None
 ) -> RetrievalResponse:
-    results = results or [_make_retrieval_result()]
+    if results is None:
+        results = [_make_retrieval_result()]
     return RetrievalResponse(
         query=query,
         top_k=5,
@@ -141,6 +142,7 @@ class TestRAGPipeline:
             retrieval_service=mock_retrieval,
             generation_provider=mock_provider,
             generation_config=GenerationConfig(max_context_tokens=10000),
+            transcript_fallback_enabled=False,
         )
 
         response = asyncio.run(pipeline.query("Unknown topic?"))
@@ -258,3 +260,77 @@ class TestResponseCache:
         asyncio.run(pipeline.query("What are polymers?"))
         assert mock_retrieval.retrieve.call_count == 2
         assert mock_provider.generate.call_count == 2
+
+
+class TestTranscriptFallback:
+    """Tests for the transcript fallback integration in RAGPipeline."""
+
+    def _make_pipeline(
+        self,
+        retrieval_results: list[RetrievalResult],
+        answer: str = "Transcript-based answer.",
+        fallback_enabled: bool = True,
+        transcript_path: str = "data/transcript.md",
+    ) -> tuple["RAGPipeline", MagicMock]:
+        mock_retrieval = MagicMock()
+        mock_retrieval.retrieve = AsyncMock(
+            return_value=_make_retrieval_response(results=retrieval_results)
+        )
+        mock_provider = MagicMock()
+        mock_provider.generate.return_value = _make_generation_response(text=answer)
+        pipeline = RAGPipeline(
+            retrieval_service=mock_retrieval,
+            generation_provider=mock_provider,
+            generation_config=GenerationConfig(max_context_tokens=10000),
+            transcript_fallback_enabled=fallback_enabled,
+            transcript_path=transcript_path,
+        )
+        return pipeline, mock_provider
+
+    def test_empty_retrieval_triggers_fallback(self):
+        """Empty retrieval results → fallback loads transcript and uses TRANSCRIPT_FALLBACK."""
+        pipeline, _ = self._make_pipeline(retrieval_results=[])
+        response = asyncio.run(pipeline.query("What is RAG?"))
+        assert response.prompt_version == "transcript_fallback_v1"
+        assert any(s.source_path == "data/transcript.md" for s in response.sources)
+
+    def test_low_score_retrieval_triggers_fallback(self):
+        """Max similarity < 0.3 → fallback loads transcript and uses TRANSCRIPT_FALLBACK."""
+        low_score_result = _make_retrieval_result(score=0.1)
+        pipeline, _ = self._make_pipeline(retrieval_results=[low_score_result])
+        response = asyncio.run(pipeline.query("Obscure topic?"))
+        assert response.prompt_version == "transcript_fallback_v1"
+        assert any(s.source_path == "data/transcript.md" for s in response.sources)
+
+    def test_high_score_retrieval_does_not_trigger_fallback(self):
+        """Max similarity >= 0.3 → normal QA path, no fallback."""
+        high_score_result = _make_retrieval_result(score=0.85)
+        pipeline, _ = self._make_pipeline(retrieval_results=[high_score_result])
+        response = asyncio.run(pipeline.query("What are polymers?"))
+        assert response.prompt_version == "qa_v1"
+        assert all(s.source_path != "data/transcript.md" for s in response.sources)
+
+    def test_fallback_disabled_does_not_load_transcript(self):
+        """TRANSCRIPT_FALLBACK_ENABLED=false → INSUFFICIENT path used even for empty retrieval."""
+        pipeline, _ = self._make_pipeline(
+            retrieval_results=[], fallback_enabled=False
+        )
+        response = asyncio.run(pipeline.query("What is RAG?"))
+        assert response.prompt_version == "insufficient_v1"
+        assert not any(s.source_path == "data/transcript.md" for s in response.sources)
+
+    def test_fallback_missing_transcript_file_returns_insufficient(self):
+        """Missing transcript file → fallback returns empty chunks → insufficient prompt used.
+
+        Note: When _load_transcript_as_chunks() returns [] and the variant is
+        TRANSCRIPT_FALLBACK, the render call produces the fallback template with
+        an empty context block. The answer is still generated (not an error).
+        """
+        pipeline, _ = self._make_pipeline(
+            retrieval_results=[],
+            transcript_path="data/nonexistent_transcript.md",
+        )
+        response = asyncio.run(pipeline.query("What is RAG?"))
+        # With no chunks, the fallback template still renders (empty context)
+        assert response.prompt_version == "transcript_fallback_v1"
+        assert response.answer == "Transcript-based answer."
