@@ -1,0 +1,27 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.github
+# Virtual environments
+.venv
+.env
+.md
+rag-plan.md
+
+# Keep data/results directories in git, ignore their contents.
+data/*
+!data/.gitkeep
+
+results/*
+!results/.gitkeep
+
+# Embedding cache and output
+.embedding_cache/
+.embedding_output/
+
+# Local planning artifacts
+plans/

@@ -1,0 +1,69 @@
+{
+  "version": "0.1.0",
+  "created_at": "2026-04-04T00:00:00Z",
+  "annotations": [
+    {
+      "query": "What is the glass transition temperature of polymers?",
+      "relevant_chunk_ids": ["b15f3fc0-f013-410e-93d1-227cefba13db"],
+      "tags": ["factual"],
+      "notes": "Populate from Polymers-Lecture chunks."
+    },
+    {
+      "query": "Explain the cross-linking process in polymer chemistry",
+      "relevant_chunk_ids": ["61c5c743-7af2-436b-a1f5-b903aac22f18"],
+      "tags": ["factual"],
+      "notes": "Populate from Polymers-Lecture chunks."
+    },
+    {
+      "query": "What datasets are available for the Time Waster Retreat model?",
+      "relevant_chunk_ids": ["96bfc1bb-ffb6-4302-8490-aa801b9de33e"],
+      "tags": ["factual"],
+      "notes": "Populate from READ ME Time Waster Retreat chunks."
+    },
+    {
+      "query": "What are the benefits of Sampoorna Raksha Promise plan?",
+      "relevant_chunk_ids": ["4095a097-7cd6-4f54-93fa-476d6c54e015"],
+      "tags": ["factual"],
+      "notes": "Populate from Sampoorna-Raksha-Promise chunks."
+    },
+    {
+      "query": "Tell me about Life Bricks use cases",
+      "relevant_chunk_ids": ["da6e64cc-84ca-486a-8a1d-aeefacb4faf6"],
+      "tags": ["factual"],
+      "notes": "Populate from Life Bricks chunks."
+    },
+    {
+      "query": "What programming skills does Shubh have?",
+      "relevant_chunk_ids": ["efee58f2-f43b-4c03-aab6-20fab76177aa"],
+      "tags": ["factual"],
+      "notes": "Populate from CV-Shubh chunks."
+    },
+    {
+      "query": "polymer molecular weight distribution",
+      "relevant_chunk_ids": ["862ae419-4522-4872-a09c-6b2546f52c0f"],
+      "tags": ["paraphrased"],
+      "notes": "Different wording for polymer lecture content."
+    },
+    {
+      "query": "insurance plan coverage details",
+      "relevant_chunk_ids": ["b15f3fc0-f013-410e-93d1-227cefba13db"],
+      "tags": ["paraphrased"],
+      "notes": "Paraphrased query for Sampoorna Raksha content."
+    },
+    {
+      "query": "What are the key polymer properties discussed in lectures 1-3?",
+      "relevant_chunk_ids": [
+        "61c5c743-7af2-436b-a1f5-b903aac22f18",
+        "96bfc1bb-ffb6-4302-8490-aa801b9de33e"
+      ],
+      "tags": ["multi-hop"],
+      "notes": "Requires chunks from multiple sections."
+    },
+    {
+      "query": "completely unrelated topic about quantum computing",
+      "relevant_chunk_ids": [],
+      "tags": ["negative"],
+      "notes": "No relevant docs expected - tests low-score behavior."
+    }
+  ]
+}
