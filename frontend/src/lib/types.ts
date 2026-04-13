@@ -72,3 +72,24 @@ export interface HealthResponse {
   status: string;
   database: string;
 }
+
+export interface UploadJobResponse {
+  job_id: string;
+}
+
+export type UploadStage =
+  | 'queued'
+  | 'loading'
+  | 'saving'
+  | 'embedding'
+  | 'indexing'
+  | 'complete'
+  | 'error';
+
+export interface UploadStatusResponse {
+  job_id: string;
+  stage: UploadStage;
+  progress: number;
+  error: string | null;
+  document_id: string | null;
+}

@@ -2,10 +2,13 @@
 
 from generation.context_manager import ContextManager
 from generation.llm_service import (
+	EnrichmentProvider,
 	GeminiGenerationProvider,
 	GeminiProvider,
 	GenerationProvider,
 	GroqProvider,
+	MistralEnrichmentProvider,
+	get_enrichment_provider,
 	get_generation_provider,
 )
 from generation.models import (
@@ -19,17 +22,20 @@ from generation.models import (
 )
 
 __all__ = [
-	"CerebrasProvider",
 	"ChunkEnrichment",
 	"ContextManager",
+	"EnrichmentProvider",
 	"GeminiGenerationProvider",
 	"GeminiProvider",
 	"GenerationConfig",
 	"GenerationProvider",
 	"GenerationResponse",
+	"GroqProvider",
 	"LLMConfig",
+	"MistralEnrichmentProvider",
 	"PromptVariant",
 	"RenderedPrompt",
 	"TokenUsage",
+	"get_enrichment_provider",
 	"get_generation_provider",
 ]

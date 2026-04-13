@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { fetchDocuments } from '../lib/api';
 import DocumentCard from '../components/library/DocumentCard';
 import HealthMetrics from '../components/library/HealthMetrics';
+import UploadModal from '../components/library/UploadModal';
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -12,12 +13,17 @@ const pageVariants = {
 };
 
 export default function Library() {
+  const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ['documents'],
     queryFn: fetchDocuments,
     retry: false,
   });
-  const [showUploadInfo, setShowUploadInfo] = useState(false);
+  const [showUpload, setShowUpload] = useState(false);
+
+  const handleUploadSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ['documents'] });
+  };
 
   return (
     <motion.div
@@ -39,7 +45,7 @@ export default function Library() {
             </p>
           </div>
           <button
-            onClick={() => setShowUploadInfo(true)}
+            onClick={() => setShowUpload(true)}
             className="flex items-center justify-center gap-2 px-8 py-4 primary-gradient text-white rounded-full font-headline font-bold text-sm tracking-widest shadow-xl hover:scale-[0.98] transition-transform w-full md:w-auto"
           >
             <span className="material-symbols-outlined">upload_file</span>
@@ -47,37 +53,11 @@ export default function Library() {
           </button>
         </header>
 
-        {/* Upload Info Modal */}
-        {showUploadInfo && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-            onClick={() => setShowUploadInfo(false)}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-slate-900 border border-white/10 rounded-2xl p-8 max-w-md mx-4 shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 className="font-headline font-bold text-xl mb-4 text-white">
-                Upload via CLI
-              </h3>
-              <p className="text-slate-400 text-sm mb-6">
-                Documents are ingested through the FullRag CLI pipeline for
-                optimal structure-aware chunking and metadata enrichment.
-              </p>
-              <code className="block bg-slate-800 rounded-xl px-4 py-3 text-sm text-indigo-300 font-mono mb-6 overflow-x-auto">
-                python -m ingestion ingest &lt;file-path&gt;
-              </code>
-              <button
-                onClick={() => setShowUploadInfo(false)}
-                className="w-full py-3 primary-gradient text-white rounded-xl font-headline font-bold text-sm"
-              >
-                Got it
-              </button>
-            </motion.div>
-          </div>
-        )}
+        <UploadModal
+          open={showUpload}
+          onClose={() => setShowUpload(false)}
+          onSuccess={handleUploadSuccess}
+        />
 
         {/* Document Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
@@ -105,7 +85,7 @@ export default function Library() {
                 No documents yet
               </p>
               <p className="text-sm">
-                Use the CLI to ingest your first document.
+                Upload your first document to get started.
               </p>
             </div>
           )}

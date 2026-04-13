@@ -8,7 +8,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from api.routes import documents, evaluation, health, query
+from api.routes import documents, evaluation, health, query, upload
 from config.settings import (
     get_continuous_eval_enabled,
     get_eval_schedule_interval_hours,
@@ -106,6 +106,7 @@ app.include_router(health.router, tags=["health"])
 app.include_router(documents.router, tags=["documents"])
 app.include_router(query.router, tags=["query"])
 app.include_router(evaluation.router, tags=["evaluation"])
+app.include_router(upload.router, tags=["upload"])
 
 
 @app.exception_handler(Exception)

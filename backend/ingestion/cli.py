@@ -79,7 +79,7 @@ def _run_ingest(args: argparse.Namespace) -> None:
 
 def _run_enrich(args: argparse.Namespace) -> None:
     """Run the enrich subcommand."""
-    from generation.llm_service import GeminiProvider
+    from generation.llm_service import get_enrichment_provider
     from generation.models import LLMConfig
     from ingestion.enrichment import enrich_chunks
     from ingestion.staging import load_staged_document, stage_document
@@ -122,7 +122,7 @@ def _run_enrich(args: argparse.Namespace) -> None:
         temperature=args.temperature,
         max_output_tokens=args.max_tokens,
     )
-    provider = GeminiProvider(config=config)
+    provider = get_enrichment_provider(config=config)
 
     # Enrich all chunks
     start_time = time.perf_counter()

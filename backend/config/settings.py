@@ -5,8 +5,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# Load .env from project root (two levels up from this file)
-_env_path = Path(__file__).resolve().parent.parent / ".env"
+# Load .env from project root (three levels up from this file: config -> backend -> root)
+_env_path = Path(__file__).resolve().parent.parent.parent / ".env"
 load_dotenv(_env_path)
 
 
@@ -99,6 +99,36 @@ def get_groq_model() -> str:
     Defaults to llama-3.3-70b-versatile. Override with GROQ_MODEL env var.
     """
     return os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+
+
+def get_mistral_api_key() -> str:
+    """Return the Mistral API key from environment.
+
+    Raises:
+        RuntimeError: If MISTRAL_API_KEY is not set.
+    """
+    key = os.environ.get("MISTRAL_API_KEY", "")
+    if not key:
+        raise RuntimeError(
+            "MISTRAL_API_KEY not set. Add it to your .env file."
+        )
+    return key
+
+
+def get_mistral_model() -> str:
+    """Return the Mistral model name for enrichment from environment.
+
+    Defaults to mistral-small-latest.
+    """
+    return os.environ.get("MISTRAL_MODEL", "mistral-small-latest")
+
+
+def get_enrichment_provider() -> str:
+    """Return the enrichment provider name from environment.
+
+    Supported: 'gemini', 'mistral'. Defaults to 'gemini'.
+    """
+    return os.environ.get("ENRICHMENT_PROVIDER", "gemini")
 
 
 def get_log_level() -> str:

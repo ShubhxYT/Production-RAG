@@ -13,6 +13,8 @@ from config.settings import (
     get_groq_api_key,
     get_groq_base_url,
     get_groq_model,
+    get_mistral_api_key,
+    get_mistral_model,
 )
 from generation.models import (
     ChunkEnrichment,
@@ -45,6 +47,19 @@ class GenerationProvider(Protocol):
         Returns:
             GenerationResponse with generated text and metadata.
         """
+        ...
+
+
+@runtime_checkable
+class EnrichmentProvider(Protocol):
+    """Interface for LLM enrichment providers."""
+
+    def enrich_chunk(
+        self,
+        chunk_text: str,
+        system_prompt: str,
+    ) -> "ChunkEnrichment":
+        """Generate structured enrichment metadata for a chunk."""
         ...
 
 
@@ -123,6 +138,73 @@ class GeminiProvider:
 
         raise RuntimeError(
             f"Enrichment failed after {max_retries} retries: {last_error}"
+        )
+
+
+class MistralEnrichmentProvider:
+    """Mistral provider for structured chunk enrichment using JSON schema output."""
+
+    def __init__(self, config: LLMConfig | None = None) -> None:
+        from mistralai import Mistral
+
+        self.config = config or LLMConfig(model_name=get_mistral_model())
+        self._client = Mistral(api_key=get_mistral_api_key())
+
+    def enrich_chunk(
+        self, chunk_text: str, system_prompt: str
+    ) -> ChunkEnrichment:
+        """Generate enrichment metadata for a single chunk using Mistral.
+
+        Args:
+            chunk_text: The chunk text to enrich.
+            system_prompt: System instruction for the LLM.
+
+        Returns:
+            ChunkEnrichment with summary, keywords, and questions.
+
+        Raises:
+            RuntimeError: If all retries are exhausted.
+        """
+        max_retries = 3
+        last_error: Exception | None = None
+
+        for attempt in range(1, max_retries + 1):
+            try:
+                response = self._client.chat.complete(
+                    model=self.config.model_name,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": chunk_text},
+                    ],
+                    temperature=self.config.temperature,
+                    max_tokens=self.config.max_output_tokens,
+                    response_format={
+                        "type": "json_object",
+                    },
+                )
+
+                raw_text = response.choices[0].message.content or ""
+                if not raw_text:
+                    raise ValueError("Empty response from Mistral")
+
+                data = json.loads(raw_text)
+                return ChunkEnrichment.model_validate(data)
+
+            except Exception as e:
+                last_error = e
+                if attempt < max_retries:
+                    wait = 2**attempt
+                    logger.warning(
+                        "Mistral enrichment attempt %d/%d failed: %s. Retrying in %ds...",
+                        attempt,
+                        max_retries,
+                        e,
+                        wait,
+                    )
+                    time.sleep(wait)
+
+        raise RuntimeError(
+            f"Mistral enrichment failed after {max_retries} retries: {last_error}"
         )
 
 
@@ -310,3 +392,35 @@ def get_generation_provider(provider_name: str = "gemini") -> GenerationProvider
             f"Supported: {', '.join(providers)}"
         )
     return providers[provider_name]()
+
+
+def get_enrichment_provider(
+    provider_name: str | None = None,
+    config: LLMConfig | None = None,
+) -> EnrichmentProvider:
+    """Factory function to get an enrichment provider by name.
+
+    Args:
+        provider_name: Provider name ('gemini' or 'mistral'). If None,
+            reads ENRICHMENT_PROVIDER from environment.
+        config: Optional LLMConfig to pass to the provider.
+
+    Returns:
+        An EnrichmentProvider instance.
+
+    Raises:
+        ValueError: If the provider name is not recognized.
+    """
+    from config.settings import get_enrichment_provider as _get_provider_name
+
+    name = provider_name or _get_provider_name()
+    providers = {
+        "gemini": GeminiProvider,
+        "mistral": MistralEnrichmentProvider,
+    }
+    if name not in providers:
+        raise ValueError(
+            f"Unknown enrichment provider '{name}'. "
+            f"Supported: {', '.join(providers)}"
+        )
+    return providers[name](config=config)

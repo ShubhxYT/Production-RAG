@@ -32,6 +32,7 @@ dependencies = [
     "apscheduler>=3.10.4",
     "streamlit>=1.35.0",
     "plotly>=5.0.0",
+    "python-multipart>=0.0.26",
 ]
 
 [dependency-groups]

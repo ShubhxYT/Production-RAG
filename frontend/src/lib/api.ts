@@ -7,6 +7,8 @@ import type {
   FeedbackResponse,
   EvaluationSummary,
   HealthResponse,
+  UploadJobResponse,
+  UploadStatusResponse,
 } from './types';
 
 const client = axios.create({ baseURL: '/api' });
@@ -34,5 +36,27 @@ export async function submitFeedback(req: FeedbackRequest): Promise<FeedbackResp
 export async function fetchEvaluationSummary(since?: string): Promise<EvaluationSummary> {
   const params = since ? { since } : {};
   const { data } = await client.get<EvaluationSummary>('/evaluation/summary', { params });
+  return data;
+}
+
+export async function uploadDocument(
+  file: File,
+  onProgress: (pct: number) => void,
+): Promise<UploadJobResponse> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const { data } = await client.post<UploadJobResponse>('/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress(event) {
+      if (event.total) {
+        onProgress(Math.round((event.loaded / event.total) * 20));
+      }
+    },
+  });
+  return data;
+}
+
+export async function getUploadStatus(jobId: string): Promise<UploadStatusResponse> {
+  const { data } = await client.get<UploadStatusResponse>(`/upload/${jobId}/status`);
   return data;
 }

@@ -3,7 +3,7 @@
 import logging
 import time
 
-from generation.llm_service import GeminiProvider
+from generation.llm_service import EnrichmentProvider, GeminiProvider
 from generation.models import LLMConfig
 from generation.prompts import ENRICHMENT_SYSTEM_PROMPT
 from ingestion.models import Chunk, Document
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def enrich_chunks(
     chunks: list[Chunk],
-    llm_service: GeminiProvider,
+    llm_service: EnrichmentProvider,
     batch_delay: float = 0.5,
 ) -> list[Chunk]:
     """Enrich chunks with LLM-generated metadata.
@@ -25,7 +25,7 @@ def enrich_chunks(
 
     Args:
         chunks: List of Chunk objects to enrich.
-        llm_service: GeminiProvider instance for LLM calls.
+        llm_service: EnrichmentProvider instance for LLM calls.
         batch_delay: Seconds to wait between API calls (rate limiting).
 
     Returns:
@@ -78,7 +78,7 @@ def enrich_chunks(
 
 def enrich_document(
     document: Document,
-    llm_service: GeminiProvider | None = None,
+    llm_service: EnrichmentProvider | None = None,
     config: LLMConfig | None = None,
     batch_delay: float = 0.5,
 ) -> Document:
@@ -86,7 +86,7 @@ def enrich_document(
 
     Args:
         document: Document with populated chunks.
-        llm_service: GeminiProvider instance. Created if None.
+        llm_service: EnrichmentProvider instance. Created if None.
         config: LLM configuration. Uses defaults if None.
         batch_delay: Seconds between API calls.
 
@@ -98,7 +98,8 @@ def enrich_document(
         return document
 
     if llm_service is None:
-        llm_service = GeminiProvider(config=config)
+        from generation.llm_service import get_enrichment_provider
+        llm_service = get_enrichment_provider(config=config)
 
     enrich_chunks(document.chunks, llm_service, batch_delay=batch_delay)
     return document
