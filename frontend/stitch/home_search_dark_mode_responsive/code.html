@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html class="light dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FullRag | The Intellectual Sanctuary</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, .font-headline {
+            font-family: 'Manrope', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .dark .glass-panel {
+            background: rgba(15, 23, 42, 0.8);
+        }
+    </style>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"on-tertiary-fixed": "#002020", "on-secondary-fixed-variant": "#38485d", "on-primary": "#002388", "on-primary-container": "#c3ccff", tertiary: "#2ddbde", "tertiary-container": "#006264", "on-error-container": "#ffdad6", "primary-fixed-dim": "#b8c3ff", "surface-variant": "#323537", "primary-fixed": "#dde1ff", "on-primary-fixed": "#001356", "primary-container": "#0042e7", "surface-tint": "#b8c3ff", "surface-container": "#1d2022", "surface-container-low": "#191c1e", "tertiary-fixed-dim": "#2ddbde", surface: "#101415", "inverse-surface": "#e0e3e5", "error-container": "#93000a", "surface-dim": "#101415", "on-error": "#690005", "outline-variant": "#434653", "on-secondary": "#213145", "on-tertiary-container": "#3ce3e6", "surface-container-lowest": "#0b0f10", "surface-bright": "#363a3b", "on-primary-fixed-variant": "#0035be", "secondary-container": "#3a4a5f", "secondary-fixed": "#d3e4fe", "on-surface": "#e0e3e5", secondary: "#b7c8e1", "secondary-fixed-dim": "#b7c8e1", "inverse-primary": "#124af0", "inverse-on-surface": "#2d3133", outline: "#8d909e", "tertiary-fixed": "#5af8fb", "on-secondary-fixed": "#0b1c30", "on-surface-variant": "#c3c6d5", "on-secondary-container": "#a9bad3", background: "#101415", primary: "#b8c3ff", error: "#ffb4ab", "on-tertiary": "#003738", "on-background": "#e0e3e5", "on-tertiary-fixed-variant": "#004f51", "surface-container-high": "#272a2c", "surface-container-highest": "#323537"}, borderRadius: {DEFAULT: "1rem", lg: "2rem", xl: "3rem", full: "9999px"}, fontFamily: {headline: ["Manrope"], body: ["Inter"], label: ["Inter"], display: "Manrope"}}}};</script>
+</head>
+<body class="bg-surface dark:bg-slate-950 text-on-surface dark:text-slate-100 min-h-screen flex flex-col md:flex-row transition-colors duration-300">
+<!-- SideNavBar (Desktop Only) -->
+<aside class="hidden md:flex flex-col h-screen w-64 bg-slate-100 dark:bg-slate-900 p-4 border-r-0 z-40 fixed left-0 top-0 pt-8">
+<button class="w-full py-3 mb-8 bg-indigo-700 dark:bg-indigo-600 text-white rounded-xl font-headline font-bold text-sm hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+            New Research
+        </button>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-3 font-manrope text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="library_books">library_books</span>
+                Library
+            </a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-3 font-manrope text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+                History
+            </a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-3 font-manrope text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="health_and_safety">health_and_safety</span>
+                Health
+            </a>
+</nav>
+<div class="mt-auto space-y-1 pt-4 border-t border-slate-200 dark:border-slate-800">
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-3 font-manrope text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-3 font-manrope text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                Support
+            </a>
+</div>
+</aside>
+<!-- TopNavBar (Mobile Only) -->
+<header class="md:hidden fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-sm px-6 py-3 flex justify-between items-center transition-colors">
+<h1 class="text-xl font-bold text-indigo-700 dark:text-indigo-400 font-manrope tracking-tight">FullRag</h1>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400" data-icon="settings">settings</span>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-slate-200">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="professional portrait of a user in soft lighting for a profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCoyPgA7sARyWhAeu1jlzcG0kEjjJzLpVKW2YlNjrCJm20G4NOchO8Wv2D8v4rFNHwbfUGD45M8Aztc1D1Rl54iMq4hVX47kLQeoqfqPIe5dhHjL5FYrwttn1iy1jLdCQjHU0T3gvA8K6Bmi3KNE15ywJBNDhUfg2gqe4MT0uyF51D7BfXx922OF4p5u1sb6ISNWn4xFkmiCHKX5MrWx7j8dxvJRCXyZHgeNnt8XWvpvK0RzGWXAmO8DymeK41dy7KJ-LE5Dp-nEY"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 min-h-screen flex flex-col relative overflow-hidden pt-16 md:pt-0">
+<!-- Background Decorative Element -->
+<div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+<div class="absolute -top-[20%] -right-[10%] w-[60%] h-[60%] bg-indigo-50/50 dark:bg-indigo-900/10 rounded-full blur-[120px]"></div>
+<div class="absolute -bottom-[10%] -left-[5%] w-[40%] h-[40%] bg-blue-50/50 dark:bg-blue-900/10 rounded-full blur-[100px]"></div>
+</div>
+<!-- Hero Search Section -->
+<section class="flex-1 flex flex-col items-center justify-center px-6 py-12 z-10">
+<div class="w-full max-w-3xl space-y-12 text-center">
+<div class="space-y-4">
+<h2 class="text-4xl md:text-6xl font-extrabold text-on-surface dark:text-white font-headline tracking-tighter leading-tight">
+                        What shall we <span class="text-indigo-600 dark:text-indigo-400">uncover</span> today?
+                    </h2>
+<p class="text-lg text-slate-500 dark:text-slate-400 font-body max-w-lg mx-auto">
+                        Synthesize your documentation with editorial precision through our semantic search engine.
+                    </p>
+</div>
+<!-- Central Search Input -->
+<div class="relative group">
+<div class="absolute inset-0 bg-indigo-600/10 dark:bg-indigo-400/5 blur-xl rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
+<div class="relative flex items-center bg-surface-container-lowest dark:bg-slate-900 shadow-sm border border-transparent focus-within:border-indigo-500/20 rounded-xl p-2 transition-all duration-300">
+<div class="pl-4 pr-2 text-slate-400">
+<span class="material-symbols-outlined text-2xl" data-icon="search">search</span>
+</div>
+<input class="w-full bg-transparent border-none focus:ring-0 text-lg font-body py-4 placeholder:text-slate-400 dark:text-white" placeholder="Ask anything about your documents..." type="text"/>
+<div class="flex items-center gap-2 pr-2">
+<kbd class="hidden md:flex items-center gap-1 px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded-md text-[10px] font-bold">
+                                ⌘ K
+                            </kbd>
+<button class="bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-xl transition-all active:scale-95 shadow-md">
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Suggestion Chips -->
+<div class="flex flex-wrap justify-center gap-3">
+<button class="px-5 py-2.5 bg-secondary-fixed-dim/20 hover:bg-secondary-fixed-dim/40 dark:bg-slate-800 dark:hover:bg-slate-700 text-on-secondary-fixed-variant dark:text-slate-300 rounded-full text-sm font-medium transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-base" data-icon="article">article</span>
+                        Quarterly Review
+                    </button>
+<button class="px-5 py-2.5 bg-secondary-fixed-dim/20 hover:bg-secondary-fixed-dim/40 dark:bg-slate-800 dark:hover:bg-slate-700 text-on-secondary-fixed-variant dark:text-slate-300 rounded-full text-sm font-medium transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-base" data-icon="data_object">data_object</span>
+                        API Documentation
+                    </button>
+<button class="px-5 py-2.5 bg-secondary-fixed-dim/20 hover:bg-secondary-fixed-dim/40 dark:bg-slate-800 dark:hover:bg-slate-700 text-on-secondary-fixed-variant dark:text-slate-300 rounded-full text-sm font-medium transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-base" data-icon="verified_user">verified_user</span>
+                        Security Protocols
+                    </button>
+</div>
+</div>
+</section>
+<!-- System Health Footer Badge -->
+<footer class="p-8 z-10 flex flex-col items-center gap-6">
+<div class="flex items-center gap-4 text-slate-400 dark:text-slate-500 font-label text-xs uppercase tracking-[0.2em] font-semibold">
+<span>Documents Indexed: 14,204</span>
+<span class="w-1 h-1 bg-slate-300 dark:bg-slate-700 rounded-full"></span>
+<span>Active Nodes: 12</span>
+</div>
+<div class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 rounded-full text-xs font-bold border border-emerald-100/50 dark:border-emerald-900/50 backdrop-blur-sm">
+<span class="flex h-2 w-2 relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+</span>
+                System Healthy
+            </div>
+</footer>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-xl flex justify-around items-center py-4 px-4 z-50 border-t border-slate-200/50 dark:border-slate-800/50">
+<a class="flex flex-col items-center gap-1 text-indigo-600 dark:text-indigo-400" href="#">
+<span class="material-symbols-outlined" data-icon="search_spark" style="font-variation-settings: 'FILL' 1;">search_spark</span>
+<span class="text-[10px] font-bold">Query</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined" data-icon="library_books">library_books</span>
+<span class="text-[10px] font-bold">Library</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="text-[10px] font-bold">History</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined" data-icon="health_and_safety">health_and_safety</span>
+<span class="text-[10px] font-bold">Health</span>
+</a>
+</nav>
+<!-- Background Layer (Absolute) -->
+<div class="fixed inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] dark:opacity-[0.05] pointer-events-none z-0"></div>
+</body></html>

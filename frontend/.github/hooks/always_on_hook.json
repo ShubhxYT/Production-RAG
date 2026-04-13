@@ -1,0 +1,11 @@
+{
+  "name": "always-on-lifecycle-hook",
+  "description": "Example hook that runs lightweight checks on lifecycle events",
+  "events": ["PreSession", "PreToolUse", "PostToolUse"],
+  "commands": [
+    {
+      "event": "PreSession",
+      "run": "echo 'always-on hook: workspace loaded'"
+    }
+  ]
+}

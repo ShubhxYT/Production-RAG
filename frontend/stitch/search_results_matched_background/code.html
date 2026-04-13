@@ -1,0 +1,244 @@
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Inter:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#213145",
+                        "on-primary-container": "#c3ccff",
+                        "surface-container-lowest": "#0b0f10",
+                        "on-error": "#690005",
+                        "primary": "#b8c3ff",
+                        "inverse-primary": "#124af0",
+                        "secondary-fixed": "#d3e4fe",
+                        "on-surface": "#e0e3e5",
+                        "primary-container": "#0042e7",
+                        "error": "#ffb4ab",
+                        "on-secondary-container": "#a9bad3",
+                        "on-secondary-fixed": "#0b1c30",
+                        "on-primary-fixed-variant": "#0035be",
+                        "on-tertiary": "#003738",
+                        "primary-fixed-dim": "#b8c3ff",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "surface-bright": "#363a3b",
+                        "surface-container-low": "#191c1e",
+                        "surface-container-high": "#272a2c",
+                        "surface-variant": "#323537",
+                        "on-primary": "#002388",
+                        "surface-dim": "#101415",
+                        "secondary": "#b7c8e1",
+                        "on-tertiary-container": "#3ce3e6",
+                        "outline-variant": "#434653",
+                        "outline": "#8d909e",
+                        "surface-tint": "#b8c3ff",
+                        "surface-container": "#1d2022",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "tertiary-fixed-dim": "#2ddbde",
+                        "surface-container-highest": "#323537",
+                        "on-tertiary-fixed-variant": "#004f51",
+                        "tertiary-fixed": "#5af8fb",
+                        "on-surface-variant": "#c3c6d5",
+                        "on-primary-fixed": "#001356",
+                        "tertiary": "#2ddbde",
+                        "inverse-surface": "#e0e3e5",
+                        "on-tertiary-fixed": "#002020",
+                        "background": "#101415",
+                        "secondary-container": "#3a4a5f",
+                        "surface": "#101415",
+                        "tertiary-container": "#006264",
+                        "on-background": "#e0e3e5",
+                        "primary-fixed": "#dde1ff",
+                        "inverse-on-surface": "#2d3133"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0f172a; /* Deep Slate Base */
+            color: #e0e3e5;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
+        }
+    </style>
+</head>
+<body class="flex min-h-screen bg-slate-950 text-on-surface">
+<!-- Background Decorative Elements from Home Screen -->
+<div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+<div class="absolute -top-[20%] -right-[10%] w-[60%] h-[60%] bg-indigo-900/10 rounded-full blur-[120px]"></div>
+<div class="absolute -bottom-[10%] -left-[5%] w-[40%] h-[40%] bg-blue-900/10 rounded-full blur-[100px]"></div>
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.05]"></div>
+</div>
+<aside class="h-screen w-64 fixed left-0 top-0 bg-slate-900/80 backdrop-blur-xl border-r border-slate-800/50 flex flex-col py-8 px-4 z-50">
+<div class="mb-10 px-2">
+<h1 class="text-lg font-black text-indigo-400 font-headline">The Sanctuary</h1>
+<p class="text-[10px] text-slate-500 font-label tracking-widest uppercase">Intelligent Curator</p>
+</div>
+<nav class="flex-grow space-y-2">
+<button class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ease-in-out text-indigo-300 bg-indigo-500/10 border-r-2 border-indigo-500">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-['Manrope'] text-sm">Discover</span>
+</button>
+<button class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ease-in-out text-slate-400 hover:text-indigo-300 hover:bg-slate-800/50">
+<span class="material-symbols-outlined">book_2</span>
+<span class="font-['Manrope'] text-sm">Library</span>
+</button>
+<button class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ease-in-out text-slate-400 hover:text-indigo-300 hover:bg-slate-800/50">
+<span class="material-symbols-outlined">folder_shared</span>
+<span class="font-['Manrope'] text-sm">Collections</span>
+</button>
+<button class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ease-in-out text-slate-400 hover:text-indigo-300 hover:bg-slate-800/50">
+<span class="material-symbols-outlined">history</span>
+<span class="font-['Manrope'] text-sm">History</span>
+</button>
+</nav>
+<div class="mt-auto space-y-4 pt-6 border-t border-slate-800/50">
+<button class="w-full primary-gradient text-white py-3 px-4 rounded-xl text-xs font-bold tracking-widest uppercase flex items-center justify-center space-x-2 shadow-lg shadow-indigo-950/50">
+<span class="material-symbols-outlined text-sm">add</span>
+<span>New Search</span>
+</button>
+<div class="space-y-1">
+<button class="w-full flex items-center space-x-3 px-4 py-2 rounded-xl text-slate-500 hover:text-indigo-300 hover:bg-slate-800/50 transition-all duration-300">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-['Manrope'] text-sm">Archive</span>
+</button>
+<button class="w-full flex items-center space-x-3 px-4 py-2 rounded-xl text-slate-500 hover:text-indigo-300 hover:bg-slate-800/50 transition-all duration-300">
+<span class="material-symbols-outlined">delete</span>
+<span class="font-['Manrope'] text-sm">Trash</span>
+</button>
+</div>
+<div class="flex items-center space-x-2 px-4 py-2 opacity-50">
+<div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] animate-pulse"></div>
+<span class="text-[10px] font-label font-medium uppercase tracking-tighter">System Healthy</span>
+</div>
+</div>
+</aside>
+<div class="flex-1 ml-64 min-h-screen flex flex-col relative z-10">
+<header class="flex justify-between items-center px-8 py-4 w-full sticky top-0 z-50 bg-slate-950/60 backdrop-blur-xl border-b border-white/5">
+<div class="flex items-center flex-1 max-w-2xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">search</span>
+<input class="w-full bg-slate-900/50 border border-slate-800/50 rounded-xl py-2 pl-12 pr-4 text-sm text-on-surface focus:ring-1 focus:ring-indigo-500 focus:bg-slate-900 transition-all placeholder-slate-500" placeholder="Quantum computing scalability benchmarks..." type="text"/>
+</div>
+</div>
+<div class="flex items-center space-x-6 ml-6">
+<div class="text-xl font-bold bg-gradient-to-br from-indigo-400 to-indigo-600 bg-clip-text text-transparent font-headline tracking-tight">Cerebro Flux</div>
+<div class="flex items-center space-x-4">
+<button class="material-symbols-outlined text-slate-500 hover:text-white transition-colors p-2 rounded-full hover:bg-slate-800/50">settings</button>
+<button class="material-symbols-outlined text-slate-500 hover:text-white transition-colors p-2 rounded-full hover:bg-slate-800/50">help</button>
+<div class="h-9 w-9 rounded-full bg-slate-800 overflow-hidden ring-2 ring-indigo-500/20 shadow-lg">
+<img alt="User profile" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDY5kDzlI0UZQiOaZaUd83gDijGhm3RhopinMJL5YxnzfpTrbVpaGeIQlR2XsxpE2d8jwh-1ZIqRjr2zyHdTSZQDj7cBJXhRHHbLs-FsIqAM2sHtLQk48cqanxtfShw5KiYGIEc_1LkgByd3xZv5voKsbefFt22KDagW_TAF2oKUWccXurraRb-QZbSNXTYFXDmHxGJkOqWjQA-t766Kko7u-Lh4AH_ny1xwvTTQHsCTi4o90oWWRGKz7MDQi0yqGeAj-7MIS58SQ"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-4xl mx-auto w-full px-8 py-12 flex-grow">
+<section class="mb-10">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-3xl font-extrabold font-headline tracking-tight text-white">Curated Synthesis</h2>
+<div class="flex items-center px-4 py-2 bg-emerald-950/30 border border-emerald-500/20 rounded-full backdrop-blur-md">
+<span class="material-symbols-outlined text-emerald-400 text-sm mr-2" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="text-[11px] font-bold text-emerald-400 tracking-widest uppercase">95% Grounded</span>
+</div>
+</div>
+<div class="bg-slate-900/40 border border-white/5 backdrop-blur-sm p-8 rounded-2xl shadow-2xl leading-relaxed text-slate-200/90 space-y-6">
+<p class="text-lg font-body font-light">
+                    Quantum computing scalability remains one of the most significant hurdles in moving from NISQ (Noisy Intermediate-Scale Quantum) devices to fault-tolerant systems. Recent benchmarks suggest that <span class="text-indigo-400 font-semibold">superconducting qubits</span> are leading in error-correction overhead reduction <span class="inline-flex items-center justify-center bg-indigo-500/20 text-indigo-300 rounded-lg px-2 py-0.5 text-[10px] font-bold mx-1 cursor-pointer hover:bg-indigo-500/40 transition-colors border border-indigo-500/20">[1]</span>. 
+                </p>
+<p class="text-lg font-body font-light">
+                    Specifically, the implementation of <span class="text-indigo-400 font-semibold">surface codes</span> has demonstrated a threshold of approximately 10⁻³ for physical gate errors, which is critical for maintaining logical qubit coherence across expanding matrices <span class="inline-flex items-center justify-center bg-indigo-500/20 text-indigo-300 rounded-lg px-2 py-0.5 text-[10px] font-bold mx-1 cursor-pointer hover:bg-indigo-500/40 transition-colors border border-indigo-500/20">[2]</span>. However, the connectivity requirements for 2D surface codes pose a physical routing challenge as chip density increases <span class="inline-flex items-center justify-center bg-indigo-500/20 text-indigo-300 rounded-lg px-2 py-0.5 text-[10px] font-bold mx-1 cursor-pointer hover:bg-indigo-500/40 transition-colors border border-indigo-500/20">[4]</span>.
+                </p>
+<p class="text-lg font-body font-light">
+                    Alternate architectures, such as <span class="text-indigo-400 font-semibold">Trapped-Ion systems</span>, offer superior connectivity but face slower gate execution speeds. Scaling these requires modular photonic interconnects to link multiple trap zones, a technique currently being validated in specialized research laboratories <span class="inline-flex items-center justify-center bg-indigo-500/20 text-indigo-300 rounded-lg px-2 py-0.5 text-[10px] font-bold mx-1 cursor-pointer hover:bg-indigo-500/40 transition-colors border border-indigo-500/20">[3]</span>.
+                </p>
+</div>
+</section>
+<section class="mb-12">
+<div class="flex items-center space-x-2 mb-4 opacity-60">
+<span class="material-symbols-outlined text-slate-400 text-xs">database</span>
+<h3 class="text-[10px] font-bold font-headline tracking-widest uppercase text-slate-400">Sources</h3>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+<div class="group bg-slate-900/60 border border-white/5 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:border-indigo-500/30 transition-all flex items-center justify-between cursor-pointer">
+<div class="flex items-center space-x-3 overflow-hidden">
+<span class="text-[8px] font-bold text-indigo-400 uppercase tracking-tighter shrink-0 bg-indigo-500/10 px-1.5 py-0.5 rounded">Paper</span>
+<h4 class="text-xs text-slate-300 font-medium truncate group-hover:text-white transition-colors">Quantum Computing Scalability</h4>
+</div>
+<span class="text-[10px] text-slate-500 font-label shrink-0 ml-1">4ch</span>
+</div>
+<div class="group bg-slate-900/60 border border-white/5 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:border-indigo-500/30 transition-all flex items-center justify-between cursor-pointer">
+<div class="flex items-center space-x-3 overflow-hidden">
+<span class="text-[8px] font-bold text-indigo-400 uppercase tracking-tighter shrink-0 bg-indigo-500/10 px-1.5 py-0.5 rounded">Report</span>
+<h4 class="text-xs text-slate-300 font-medium truncate group-hover:text-white transition-colors">Surface Code Benchmarks</h4>
+</div>
+<span class="text-[10px] text-slate-500 font-label shrink-0 ml-1">12ch</span>
+</div>
+<div class="group bg-slate-900/60 border border-white/5 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:border-indigo-500/30 transition-all flex items-center justify-between cursor-pointer">
+<div class="flex items-center space-x-3 overflow-hidden">
+<span class="text-[8px] font-bold text-indigo-400 uppercase tracking-tighter shrink-0 bg-indigo-500/10 px-1.5 py-0.5 rounded">Journal</span>
+<h4 class="text-xs text-slate-300 font-medium truncate group-hover:text-white transition-colors">Trapped-Ion Connectivity</h4>
+</div>
+<span class="text-[10px] text-slate-500 font-label shrink-0 ml-1">7ch</span>
+</div>
+<div class="group bg-slate-900/60 border border-white/5 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:border-indigo-500/30 transition-all flex items-center justify-between cursor-pointer">
+<div class="flex items-center space-x-3 overflow-hidden">
+<span class="text-[8px] font-bold text-indigo-400 uppercase tracking-tighter shrink-0 bg-indigo-500/10 px-1.5 py-0.5 rounded">Review</span>
+<h4 class="text-xs text-slate-300 font-medium truncate group-hover:text-white transition-colors">Routing in 2D Lattices</h4>
+</div>
+<span class="text-[10px] text-slate-500 font-label shrink-0 ml-1">3ch</span>
+</div>
+</div>
+</section>
+</main>
+<footer class="sticky bottom-0 w-full px-8 pb-10 pt-4 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent">
+<div class="max-w-4xl mx-auto relative group">
+<div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-indigo-800 rounded-2xl blur opacity-20 group-focus-within:opacity-40 transition duration-1000"></div>
+<div class="relative bg-slate-900/80 backdrop-blur-xl rounded-2xl flex items-center px-6 py-5 shadow-2xl border border-white/10">
+<span class="material-symbols-outlined text-indigo-400 mr-4 text-2xl">psychology</span>
+<input class="flex-grow bg-transparent border-none text-white focus:ring-0 placeholder-slate-500 font-body text-base" placeholder="Ask a follow-up question..." type="text"/>
+<div class="flex items-center space-x-4">
+<button class="material-symbols-outlined text-slate-400 hover:text-white transition-colors">mic</button>
+<button class="material-symbols-outlined text-slate-400 hover:text-white transition-colors">attach_file</button>
+<button class="h-11 w-11 primary-gradient rounded-xl flex items-center justify-center text-white shadow-xl shadow-indigo-900/40 hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined">arrow_upward</span>
+</button>
+</div>
+</div>
+<div class="mt-6 flex flex-wrap justify-center gap-4">
+<button class="text-[10px] font-bold text-slate-400 hover:text-indigo-300 transition-all uppercase tracking-widest px-4 py-2 bg-slate-900/60 border border-white/5 hover:border-indigo-500/30 rounded-full backdrop-blur-sm">Explain Error Correction</button>
+<button class="text-[10px] font-bold text-slate-400 hover:text-indigo-300 transition-all uppercase tracking-widest px-4 py-2 bg-slate-900/60 border border-white/5 hover:border-indigo-500/30 rounded-full backdrop-blur-sm">Future Projections</button>
+<button class="text-[10px] font-bold text-slate-400 hover:text-indigo-300 transition-all uppercase tracking-widest px-4 py-2 bg-slate-900/60 border border-white/5 hover:border-indigo-500/30 rounded-full backdrop-blur-sm">Cost Comparison</button>
+</div>
+</div>
+</footer>
+</div>
+</body></html>
