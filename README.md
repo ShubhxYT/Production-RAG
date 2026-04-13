@@ -2,34 +2,14 @@
 
 A production-ready Retrieval-Augmented Generation (RAG) system combining a FastAPI Python backend with a React TypeScript frontend, backed by PostgreSQL + pgvector for semantic search.
 
-## System Preview Image
-
-![FullRag Architecture](backend/fullrag-architecture.png)
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────┐
-│                  FullRag-Plus                        │
-│                                                     │
-│  ┌──────────────────┐     ┌─────────────────────┐   │
-│  │  React Frontend  │     │  Streamlit Admin    │   │
-│  │  (port 5173/80)  │     │  (port 8501)        │   │
-│  └────────┬─────────┘     └─────────────────────┘   │
-│           │ /api/* requests                          │
-│           ▼                                          │
-│  ┌──────────────────┐                               │
-│  │  FastAPI Backend │                               │
-│  │  (port 8001)     │                               │
-│  └────┬─────────────┘                               │
-│       │              │                              │
-│       ▼              ▼                              │
-│  ┌─────────┐   ┌──────────────┐                    │
-│  │pgvector │   │ LLM Provider │                    │
-│  │  (5432) │   │ Gemini/Groq  │                    │
-│  └─────────┘   └──────────────┘                    │
-└─────────────────────────────────────────────────────┘
-```
+![Architecture](architecture.png)
+
+## System Preview Image
+
+![FullRag Architecture](backend/fullrag-architecture.png)
 
 **Request flow:** User query → React UI → FastAPI `/query` → pgvector similarity search → LLM generation (Gemini or Groq) → answer with sources returned to UI.
 
