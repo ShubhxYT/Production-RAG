@@ -248,7 +248,7 @@ export default function UploadModal({ open, onClose, onSuccess }: Props) {
                     (s) => {
                       const done =
                         progressPct >=
-                        { loading: 20, saving: 60, embedding: 80, indexing: 95, complete: 100 }[s]!;
+                        { loading: 20, saving: 60, embedding: 80, indexing: 95, complete: 100, queued: 0, error: 0 }[s]!;
                       const active =
                         state.kind === 'processing' && state.stage === s;
                       return (
