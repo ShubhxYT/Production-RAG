@@ -1,6 +1,34 @@
 # FullRag-Plus
 
-A production-ready Retrieval-Augmented Generation (RAG) system combining a FastAPI Python backend with a React TypeScript frontend, backed by PostgreSQL + pgvector for semantic search.
+Most RAG demos stop when they return a plausible answer. **FullRag-Plus keeps measuring after deployment.**
+
+I built this system to explore what a retrieval-augmented application needs beyond the happy path: structure-aware ingestion, inspectable retrieval, continuous evaluation, regression alerts, provider fallback, source attribution, and a debugger for every pipeline stage.
+
+The result is a full-stack RAG platform with a FastAPI backend, React + TypeScript frontend, PostgreSQL + pgvector retrieval, and a containerized production path.
+
+## Proof at a glance
+
+- **16,000+ lines** across the Python backend and React + TypeScript frontend
+- **Daily retrieval evaluation:** Precision@k, Recall@k, MRR, and NDCG@k
+- **Regression detection:** alerts when retrieval precision drops by more than 10%
+- **Four answer-quality dimensions:** faithfulness, relevance, completeness, and coherence
+- **Dual-provider generation:** Gemini and Groq with score-aware prompt selection and fallback behavior
+- **Thirteen debug views** covering ingestion, chunks, embeddings, retrieval, generation, and evaluation
+- **Three-service Docker stack:** pgvector, FastAPI, and nginx serving the React SPA
+
+## Why this exists
+
+My first university RAG project worked, but it had fixed-size chunks, basic similarity search, no reranking, no systematic evaluation, and no way to see when a change made retrieval worse. FullRag-Plus is the answer to those limitations: a system designed to be measured and operated, not only demonstrated.
+
+## Key engineering decisions
+
+| Decision | Why |
+|---|---|
+| PostgreSQL + pgvector with HNSW | Keep application data and vector search in one operational system |
+| Structure-aware chunks with section paths | Preserve document hierarchy and improve source inspection |
+| Scheduled retrieval metrics plus LLM-as-judge | Combine reproducible ranking metrics with answer-level signals |
+| Central provider routing and score-aware prompts | Make fallbacks and low-confidence behavior explicit |
+| Dedicated admin debugger | Inspect failures at each pipeline stage instead of guessing from the final answer |
 
 
 ## Architecture
@@ -76,7 +104,7 @@ FullRag-Plus/
 
 ```bash
 # 1. Clone and enter the repo
-git clone <repo-url> FullRag-Plus
+git clone https://github.com/ShubhxYT/FullRag-Plus.git
 cd FullRag-Plus
 
 # 2. Set up environment variables
